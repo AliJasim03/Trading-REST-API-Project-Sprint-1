@@ -1,40 +1,53 @@
--- db/create_database.sql
 
-DROP DATABASE IF EXISTS trading_sprint1;
-CREATE DATABASE trading_sprint1 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE trading_sprint1;
+DROP DATABASE IF EXISTS stock_portfolio;
+CREATE DATABASE stock_portfolio;
+USE stock_portfolio;
 
-CREATE TABLE orders (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  stockTicker VARCHAR(16) NOT NULL,
-  price DECIMAL(14,4) NOT NULL,
-  volume INT NOT NULL,
-  buyOrSell ENUM('BUY','SELL') NOT NULL,
-  statusCode TINYINT NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+CREATE TABLE portfolios (
+    portfolio_id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Some dummy data
-INSERT INTO orders (stockTicker, price, volume, buyOrSell, statusCode) VALUES
-('AAPL', 174.2500, 10, 'BUY', 0),
-('AMZN', 160.5000, 2,  'SELL', 0),
-('TSLA', 210.0000, 5,  'BUY', 0),
-('NFLX', 415.3000, 1,  'SELL', 0),
-('GOOGL', 125.7500, 3, 'BUY', 0),
-('MSFT', 290.1000, 4, 'SELL', 0),
-('FB', 330.2000, 6, 'BUY', 0),
-('NVDA', 195.6000, 8, 'SELL', 0),
-('BABA', 105.4000, 7, 'BUY', 0),
-('ORCL', 85.9000, 9, 'SELL', 0),
-('INTC', 52.3000, 12, 'BUY', 0),
-('CSCO', 48.7500, 15, 'SELL', 0),
-('ADBE', 620.5000, 2, 'BUY', 0),
-('CRM', 250.4000, 3, 'SELL', 0),
-('PYPL', 75.2000, 11, 'BUY', 0),
-('UBER', 45.6000, 14, 'SELL', 0),
-('LYFT', 55.3000, 13, 'BUY', 0),
-('SQ', 240.7000, 1, 'SELL', 0),
-('TWTR', 65.8000, 4, 'BUY', 0),
-('SNAP', 70.9000, 5, 'SELL', 0);
 
+CREATE TABLE stocks (
+    stock_id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_ticker VARCHAR(10) NOT NULL UNIQUE,   -- e.g. AAPL, AMZN
+    stock_name VARCHAR(100) NOT NULL,           -- Apple Inc, Amazon
+    sector VARCHAR(50),                        -- Optional (e.g. Tech, Finance)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,              -- Price per share in USD
+    volume INT NOT NULL,                       -- Number of shares
+    buy_or_sell ENUM('BUY','SELL') NOT NULL,     -- Transaction type
+    status_code INT DEFAULT 0,                  -- 0=Pending, 1=Filled, 2=Rejected
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
+);
+
+INSERT INTO portfolios (portfolioName, description) VALUES
+('Tech Growth', 'Focused on technology companies'),
+('Dividend Fund', 'Long-term dividend-paying stocks');
+
+
+INSERT INTO stocks (stockTicker, stockName, sector) VALUES
+('AAPL', 'Apple Inc.', 'Technology'),
+('AMZN', 'Amazon.com, Inc.', 'E-Commerce'),
+('C', 'Citigroup Inc.', 'Financials'),
+('NFLX', 'Netflix, Inc.', 'Entertainment');
+orders
+
+INSERT INTO orders (portfolio_id, stock_id, price, volume, buyOrSell, statusCode) VALUES
+(1, 1, 185.50, 10, 'BUY', 1),   -- Buy Apple into Tech Growth
+(1, 4, 390.00, 2, 'BUY', 0),    -- Buy Netflix into Tech Growth
+(2, 2, 145.20, 5, 'SELL', 0),   -- Sell Amazon in Dividend Fund
+(2, 3, 45.00, 20, 'BUY', 1);    -- Buy Citigroup in Dividend Fund
