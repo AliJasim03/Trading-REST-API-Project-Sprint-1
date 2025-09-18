@@ -1,4 +1,3 @@
-
 DROP DATABASE IF EXISTS stock_portfolio;
 CREATE DATABASE stock_portfolio;
 USE stock_portfolio;
@@ -34,19 +33,19 @@ CREATE TABLE orders (
     FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
 );
 
-INSERT INTO portfolios (portfolioName, description) VALUES
+INSERT INTO portfolios (portfolio_name, description) VALUES
 ('Tech Growth', 'Focused on technology companies'),
 ('Dividend Fund', 'Long-term dividend-paying stocks');
 
 
-INSERT INTO stocks (stockTicker, stockName, sector) VALUES
+INSERT INTO stocks (stock_ticker, stock_name, sector) VALUES
 ('AAPL', 'Apple Inc.', 'Technology'),
 ('AMZN', 'Amazon.com, Inc.', 'E-Commerce'),
 ('C', 'Citigroup Inc.', 'Financials'),
 ('NFLX', 'Netflix, Inc.', 'Entertainment');
-orders
 
-INSERT INTO orders (portfolio_id, stock_id, price, volume, buyOrSell, statusCode) VALUES
+
+INSERT INTO orders (portfolio_id, stock_id, price, volume, buy_or_sell, status_code) VALUES
 (1, 1, 185.50, 10, 'BUY', 1),   -- Buy Apple into Tech Growth
 (1, 4, 390.00, 2, 'BUY', 0),    -- Buy Netflix into Tech Growth
 (2, 2, 145.20, 5, 'SELL', 0),   -- Sell Amazon in Dividend Fund
