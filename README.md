@@ -25,10 +25,10 @@ Minimal trading orders app (database + REST API + frontend) implementing the Spr
 
 ## API
 - `GET /api/orders` — get all orders
-- `GET /api/orders/:id` — get an order
-- `POST /api/orders` — create order, JSON: `{ stockTicker, price, volume, buyOrSell }`
-- `PUT /api/orders/:id` — update order (partial)
-- `DELETE /api/orders/:id` — delete order
+- `GET /api/orders/:id` — get an orders
+- `POST /api/orders` — create orders, JSON: `{ stockTicker, price, volume, buyOrSell }`
+- `PUT /api/orders/:id` — update orders (partial)
+- `DELETE /api/orders/:id` — delete orders
 
 ## Notes
 - No authentication (single-user) as required by Sprint 1. :contentReference[oaicite:2]{index=2}

@@ -2,29 +2,32 @@ package com.group418.StockProtfolioProject.entity;
 
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Table;
-
 import java.sql.Timestamp;
 
 @Entity
 //@Table(name="orders")
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private int portfolio_id;
+    @Column(name = "order_id")
+    private int orderId;
     private double price;
     private int volume;
-
-    private BuySellType buy_or_sell;
-    private OrderType order_type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "buy_or_sell")
+    private BuySellType buyOrSell;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_type")
+    private OrderType orderType;
     private double fees;
-    private int status_code; // 0 = pending, 1 = completed, 2 = cancelled
-    private Timestamp created_at;
+    @Column(name = "status_code")
+    private int statusCode; // 0 = pending, 1 = completed, 2 = cancelled
+    @Column(name = "created_at")
+    private Timestamp createdAt;
 
     @ManyToOne
     @JoinColumn(name="portfolio_id", nullable=false)
-    private Portfolio portfolio;
+    private Portfolios portfolios;
 
     @ManyToOne
     @JoinColumn(name="stock_id", nullable=false)
@@ -33,29 +36,21 @@ public class Order {
     public enum BuySellType { BUY, SELL }
     public enum OrderType { Market, Limit, Stop }
 
-    public Order() {
+    public Orders() {
     }
 
-    public Order(int id, int portfolio_id, double price, int volume, BuySellType buy_or_sell, OrderType order_type, double fees, int status_code, Portfolio portfolio, Stocks stock) {
-        this.id = id;
-        this.portfolio_id = portfolio_id;
-        this.price = price;
+
+    public Orders(int orderId, double price, int volume, BuySellType buyOrSell, OrderType orderType, double fees, int statusCode, Timestamp createdAt, Portfolios portfolios, Stocks stock) {
+        this.orderId = orderId;
+
         this.volume = volume;
-        this.buy_or_sell = buy_or_sell;
-        this.order_type = order_type;
+        this.buyOrSell = buyOrSell;
+        this.orderType = orderType;
         this.fees = fees;
-        this.status_code = status_code;
-        this.created_at = new Timestamp(System.currentTimeMillis());
-        this.portfolio = portfolio;
+        this.statusCode = statusCode;
+        this.portfolios = portfolios;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
         this.stock = stock;
-    }
-
-    public int getPortfolio_id() {
-        return portfolio_id;
-    }
-
-    public void setPortfolio_id(int portfolio_id) {
-        this.portfolio_id = portfolio_id;
     }
 
     public double getPrice() {
@@ -83,35 +78,35 @@ public class Order {
     }
 
     public int getStatus_code() {
-        return status_code;
+        return statusCode;
     }
 
     public BuySellType getBuy_or_sell() {
-        return buy_or_sell;
+        return buyOrSell;
     }
 
     public void setBuy_or_sell(BuySellType buy_or_sell) {
-        this.buy_or_sell = buy_or_sell;
+        this.buyOrSell = buy_or_sell;
     }
 
     public OrderType getOrder_type() {
-        return order_type;
+        return orderType;
     }
 
     public void setOrder_type(OrderType order_type) {
-        this.order_type = order_type;
+        this.orderType = order_type;
     }
 
     public void setStatus_code(int status_code) {
-        this.status_code = status_code;
+        this.statusCode = status_code;
     }
 
-    public Portfolio getPortfolio() {
-        return portfolio;
+    public Portfolios getPortfolio() {
+        return portfolios;
     }
 
-    public void setPortfolio(Portfolio portfolio) {
-        this.portfolio = portfolio;
+    public void setPortfolio(Portfolios portfolios) {
+        this.portfolios = portfolios;
     }
 
     public Stocks getStock() {

@@ -18,11 +18,11 @@ public class Portfolio {
     private Timestamp created_at;
 
     @OneToMany(mappedBy = "portfolio")
-    private List<Order> orders;
+    private List<Orders> orders;
 
     public Portfolio() {}
 
-    public Portfolio(int id, String portfolio_name, String description, double initial_capital, List<Order> orders) {
+    public Portfolio(int id, String portfolio_name, String description, double initial_capital, List<Orders> orders) {
         this.id = id;
         this.portfolio_name = portfolio_name;
         this.description = description;

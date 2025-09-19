@@ -8,9 +8,11 @@ import java.sql.Date;
 public class PriceHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int price_id;
+    @Column(name = "price_id")
+    private int priceId;
     private double price;
-    private Date created_at;
+    @Column(name = "created_at")
+    private Date createdAt;
 
     @ManyToOne
     @JoinColumn(name="stock_id", nullable = false)
@@ -21,7 +23,7 @@ public class PriceHistory {
 
     public PriceHistory(double price, Date created_at, Stocks stock) {
         this.price = price;
-        this.created_at = created_at;
+        this.createdAt = created_at;
         this.stock = stock;
     }
 
@@ -34,6 +36,6 @@ public class PriceHistory {
     }
 
     public Date getCreated_at() {
-        return created_at;
+        return createdAt;
     }
 }
