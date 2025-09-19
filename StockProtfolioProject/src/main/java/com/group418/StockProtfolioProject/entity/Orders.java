@@ -42,14 +42,14 @@ public class Orders {
 
     public Orders(int orderId, double price, int volume, BuySellType buyOrSell, OrderType orderType, double fees, int statusCode, Timestamp createdAt, Portfolios portfolios, Stocks stock) {
         this.orderId = orderId;
-        this.price = price;
+
         this.volume = volume;
         this.buyOrSell = buyOrSell;
         this.orderType = orderType;
         this.fees = fees;
         this.statusCode = statusCode;
-        this.createdAt = createdAt;
         this.portfolios = portfolios;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
         this.stock = stock;
     }
 
