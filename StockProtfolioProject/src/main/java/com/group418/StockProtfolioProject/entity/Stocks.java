@@ -28,7 +28,7 @@ public class Stocks {
 
     public Stocks(){}
 
-    public Stocks(int stock_id, String stock_symbol, String stock_name, String sector, String market, String currency, String isin, String cusip, Timestamp created_at, List<Order> orders, List<PriceHistory> priceHistory) {
+    public Stocks(int stock_id, String stock_symbol, String stock_name, String sector, String market, String currency, String isin, String cusip, List<Order> orders, List<PriceHistory> priceHistory) {
         this.stock_id = stock_id;
         this.stock_symbol = stock_symbol;
         this.stock_name = stock_name;
@@ -37,7 +37,7 @@ public class Stocks {
         this.currency = currency;
         this.isin = isin;
         this.cusip = cusip;
-        this.created_at = created_at;
+        this.created_at = new Timestamp(System.currentTimeMillis());;
         this.orders = orders;
         this.priceHistory = priceHistory;
     }

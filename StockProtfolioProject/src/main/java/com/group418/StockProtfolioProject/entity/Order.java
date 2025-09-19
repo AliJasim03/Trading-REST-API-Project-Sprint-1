@@ -36,7 +36,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(int id, int portfolio_id, double price, int volume, BuySellType buy_or_sell, OrderType order_type, double fees, int status_code, Timestamp created_at, Portfolio portfolio, Stocks stock) {
+    public Order(int id, int portfolio_id, double price, int volume, BuySellType buy_or_sell, OrderType order_type, double fees, int status_code, Portfolio portfolio, Stocks stock) {
         this.id = id;
         this.portfolio_id = portfolio_id;
         this.price = price;
@@ -45,7 +45,7 @@ public class Order {
         this.order_type = order_type;
         this.fees = fees;
         this.status_code = status_code;
-        this.created_at = created_at;
+        this.created_at = new Timestamp(System.currentTimeMillis());
         this.portfolio = portfolio;
         this.stock = stock;
     }

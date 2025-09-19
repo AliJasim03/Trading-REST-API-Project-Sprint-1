@@ -22,12 +22,12 @@ public class Portfolio {
 
     public Portfolio() {}
 
-    public Portfolio(int id, String portfolio_name, String description, double initial_capital, Timestamp created_at, List<Order> orders) {
+    public Portfolio(int id, String portfolio_name, String description, double initial_capital, List<Order> orders) {
         this.id = id;
         this.portfolio_name = portfolio_name;
         this.description = description;
         this.initial_capital = initial_capital;
-        this.created_at = created_at;
+        this.created_at = new Timestamp(System.currentTimeMillis());;
         this.orders = orders;
     }
 
