@@ -1,12 +1,10 @@
 package com.group418.StockProtfolioProject.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 public class Stocks {
@@ -22,9 +20,16 @@ public class Stocks {
     private String cusip; // Committee on Uniform Securities Identification Procedures
     private Timestamp created_at;
 
+    @OneToMany(mappedBy = "stock")
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "stock")
+    private List<PriceHistory> priceHistory;
+
     public Stocks(){}
 
-    public Stocks(String stock_symbol, String stock_name, String sector, String market, String currency, String isin, String cusip, Timestamp created_at) {
+    public Stocks(int stock_id, String stock_symbol, String stock_name, String sector, String market, String currency, String isin, String cusip, Timestamp created_at, List<Order> orders, List<PriceHistory> priceHistory) {
+        this.stock_id = stock_id;
         this.stock_symbol = stock_symbol;
         this.stock_name = stock_name;
         this.sector = sector;
@@ -33,6 +38,8 @@ public class Stocks {
         this.isin = isin;
         this.cusip = cusip;
         this.created_at = created_at;
+        this.orders = orders;
+        this.priceHistory = priceHistory;
     }
 
     public String getStock_symbol() {

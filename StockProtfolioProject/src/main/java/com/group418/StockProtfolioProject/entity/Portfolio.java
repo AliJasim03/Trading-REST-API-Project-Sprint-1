@@ -1,11 +1,9 @@
 package com.group418.StockProtfolioProject.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 public class Portfolio {
@@ -19,13 +17,18 @@ public class Portfolio {
     private double initial_capital;
     private Timestamp created_at;
 
+    @OneToMany(mappedBy = "portfolio")
+    private List<Order> orders;
+
     public Portfolio() {}
 
-    public Portfolio(String portfolio_name, String description, double initial_capital, Timestamp created_at) {
+    public Portfolio(int id, String portfolio_name, String description, double initial_capital, Timestamp created_at, List<Order> orders) {
+        this.id = id;
         this.portfolio_name = portfolio_name;
         this.description = description;
         this.initial_capital = initial_capital;
         this.created_at = created_at;
+        this.orders = orders;
     }
 
     public String getPortfolio_name() {
