@@ -1,9 +1,10 @@
 package com.group418.StockProtfolioProject.controller;
 
-import com.group418.StockProtfolioProject.entity.Order;
+import com.group418.StockProtfolioProject.entity.Orders;
 import com.group418.StockProtfolioProject.service.OrdersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.*;
 
 @RestController
 @RequestMapping("/orders")
@@ -14,13 +15,27 @@ public class OrdersController {
         this.ordersService = orderService;
     }
 
-    // new order
+    // place order
     @PostMapping("/place")
-    public ResponseEntity<Order> placeOrder(@RequestParam Integer portfolio_id,
-                                            @RequestParam Integer stock_id,
-                                            @RequestBody Order order_request){
-        Order order = ordersService.placeOrder(portfolio_id, stock_id, order_request);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<Orders> placeOrder(@RequestParam Integer portfolio_id,
+                                             @RequestParam Integer stock_id,
+                                             @RequestBody Orders orders_request){
+        Orders orders = ordersService.placeOrder(portfolio_id, stock_id, orders_request);
+        return ResponseEntity.ok(orders);
+    }
+
+    // get history
+    @GetMapping("/history")
+    public ResponseEntity<List<Orders>> getTradingHistory(@RequestParam Integer portfolio_id) {
+        List<Orders> history = ordersService.getTradingHistory(portfolio_id);
+        return ResponseEntity.ok(history);
+    }
+
+    // get order status
+    @GetMapping("/{order_id}/status")
+    public ResponseEntity<Orders> getOrderStatus(@PathVariable Integer order_id) {
+        Orders orders = ordersService.getOrderStatus(order_id);
+        return ResponseEntity.ok(orders);
     }
 
 
