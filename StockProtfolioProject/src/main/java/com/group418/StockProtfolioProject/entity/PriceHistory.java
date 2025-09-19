@@ -1,9 +1,6 @@
 package com.group418.StockProtfolioProject.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 
@@ -15,12 +12,17 @@ public class PriceHistory {
     private double price;
     private Date created_at;
 
+    @ManyToOne
+    @JoinColumn(name="stock_id", nullable = false)
+    private Stocks stock;
+
     public PriceHistory() {
     }
 
-    public PriceHistory(double price, Date created_at) {
+    public PriceHistory(double price, Date created_at, Stocks stock) {
         this.price = price;
         this.created_at = created_at;
+        this.stock = stock;
     }
 
     public double getPrice() {
