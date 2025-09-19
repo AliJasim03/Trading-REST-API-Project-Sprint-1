@@ -12,8 +12,8 @@ public class Stocks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stock_id")
     private int stockId;
-    @Column(name = "stock_symbol")
-    private String stockSymbol;
+    @Column(name = "stock_ticker")
+    private String stockTicker;
     @Column(name = "stock_name")
     private String stockName;
     private String sector;  //ENUM MAYBE?
@@ -35,7 +35,7 @@ public class Stocks {
 
     public Stocks(int stockId, String stockSymbol, String stockName, String sector, String market, String currency, String isin, String cusip, Timestamp createdAt, List<Orders> orders, List<PriceHistory> priceHistory) {
         this.stockId = stockId;
-        this.stockSymbol = stockSymbol;
+        this.stockTicker = stockSymbol;
         this.stockName = stockName;
         this.sector = sector;
         this.market = market;
@@ -48,12 +48,12 @@ public class Stocks {
         this.priceHistory = priceHistory;
     }
 
-    public String getStockSymbol() {
-        return stockSymbol;
+    public String getStockTicker() {
+        return stockTicker;
     }
 
-    public void setStockSymbol(String stockSymbol) {
-        this.stockSymbol = stockSymbol;
+    public void setStockTicker(String stockTicker) {
+        this.stockTicker = stockTicker;
     }
 
     public String getStockName() {
