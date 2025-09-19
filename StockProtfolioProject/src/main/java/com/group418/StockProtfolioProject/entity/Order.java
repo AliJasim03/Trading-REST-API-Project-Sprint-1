@@ -25,13 +25,13 @@ public class Order {
     public Order() {
     }
 
-    public Order(int portfolio_id, double price, int volume, double fees, int status_code, Timestamp created_at) {
+    public Order(int portfolio_id, double price, int volume, double fees, int status_code) {
         this.portfolio_id = portfolio_id;
         this.price = price;
         this.volume = volume;
         this.fees = fees;
         this.status_code = status_code;
-        this.created_at = created_at;
+        this.created_at = new Timestamp(System.currentTimeMillis());
     }
 
     public int getPortfolio_id() {

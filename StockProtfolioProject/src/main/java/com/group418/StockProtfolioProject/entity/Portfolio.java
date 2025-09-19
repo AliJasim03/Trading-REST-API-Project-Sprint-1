@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Size;
 
 import java.sql.Timestamp;
 
@@ -12,7 +13,9 @@ public class Portfolio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Size(max=100)
     private String portfolio_name;
+    @Size(max=255)
     private String description;
     private enum portfolio_type {Personal, Retirement, Speculative};
     private enum risk_profile {Low, Medium, High};
@@ -21,11 +24,11 @@ public class Portfolio {
 
     public Portfolio() {}
 
-    public Portfolio(String portfolio_name, String description, double initial_capital, Timestamp created_at) {
+    public Portfolio(String portfolio_name, String description, double initial_capital) {
         this.portfolio_name = portfolio_name;
         this.description = description;
         this.initial_capital = initial_capital;
-        this.created_at = created_at;
+        this.created_at = new Timestamp(System.currentTimeMillis());
     }
 
     public String getPortfolio_name() {

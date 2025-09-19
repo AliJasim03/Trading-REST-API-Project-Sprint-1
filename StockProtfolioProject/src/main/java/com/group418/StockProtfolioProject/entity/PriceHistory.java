@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
 import java.sql.Date;
 
 @Entity
@@ -13,14 +12,14 @@ public class PriceHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int price_id;
     private double price;
-    private Date created_at;
+    private Date recorded_at;
 
     public PriceHistory() {
     }
 
-    public PriceHistory(double price, Date created_at) {
+    public PriceHistory(double price, Date recorded_at) {
         this.price = price;
-        this.created_at = created_at;
+        this.recorded_at = recorded_at;
     }
 
     public double getPrice() {
@@ -32,6 +31,6 @@ public class PriceHistory {
     }
 
     public Date getCreated_at() {
-        return created_at;
+        return recorded_at;
     }
 }
