@@ -22,7 +22,7 @@ CREATE TABLE stocks (
 	market VARCHAR(20),
     currency VARCHAR(10) DEFAULT 'USD',         -- Currency symbol or code
     isin VARCHAR(12) UNIQUE,                    -- International Securities Identification Number
-    cusip VARCHAR(9) UNIQUE,
+    cusip VARCHAR(9) UNIQUE,                -- 9-character alphanumeric code used in the U.S. and Canada to uniquely identify financial securities
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
