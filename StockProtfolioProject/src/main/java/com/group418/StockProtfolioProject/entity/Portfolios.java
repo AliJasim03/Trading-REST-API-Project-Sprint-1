@@ -37,6 +37,14 @@ public class Portfolios {
         //this.orders = orders;
     }
 
+    public int getPortfolioId() {
+        return portfolioId;
+    }
+
+    public void setPortfolioId(int portfolioId) {
+        this.portfolioId = portfolioId;
+    }
+
     public String getPortfolioName() {
         return portfolioName;
     }

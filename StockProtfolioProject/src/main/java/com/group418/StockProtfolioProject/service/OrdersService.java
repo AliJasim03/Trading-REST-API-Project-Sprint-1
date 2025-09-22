@@ -24,9 +24,9 @@ public class OrdersService {
 
     public Orders placeOrder(int portfolio_id, int stock_id, Orders orders_request){
         Portfolios portfolios = portfolioRepository.findById(portfolio_id)
-                .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found "));
+                .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
         Stocks stock = stocksRepository.findById(stock_id)
-                .orElseThrow(() -> new ResourceNotFoundException("Stock not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found."));
 
         orders_request.setPortfolio(portfolios);
         orders_request.setStock(stock);

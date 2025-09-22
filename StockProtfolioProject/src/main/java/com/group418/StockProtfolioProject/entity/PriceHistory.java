@@ -38,4 +38,8 @@ public class PriceHistory {
     public Date getCreated_at() {
         return createdAt;
     }
+
+    public void setCreated_at(Date created_at) {
+        this.createdAt = created_at;
+    }
 }
