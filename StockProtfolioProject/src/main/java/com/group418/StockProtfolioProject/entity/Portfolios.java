@@ -1,5 +1,6 @@
 package com.group418.StockProtfolioProject.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -21,8 +22,9 @@ public class Portfolios {
     @Column(name ="created_at")
     private Timestamp createdAt;
 
-    @OneToMany(mappedBy = "portfolios")
-    private List<Orders> orders;
+    /*@OneToMany(mappedBy = "portfolios")
+    @JsonManagedReference
+    private List<Orders> orders;*/
 
     public Portfolios() {}
 
@@ -32,7 +34,7 @@ public class Portfolios {
         this.description = description;
         this.initialCapital = initialCapital;
         this.createdAt = createdAt;
-        this.orders = orders;
+        //this.orders = orders;
     }
 
     public String getPortfolioName() {
@@ -67,11 +69,11 @@ public class Portfolios {
         this.createdAt = createdAt;
     }
 
-    public List<Orders> getOrders() {
+  /*  public List<Orders> getOrders() {
         return orders;
     }
 
     public void setOrders(List<Orders> orders) {
         this.orders = orders;
-    }
+    }*/
 }

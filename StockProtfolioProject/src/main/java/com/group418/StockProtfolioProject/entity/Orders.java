@@ -1,6 +1,7 @@
 package com.group418.StockProtfolioProject.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -26,6 +27,7 @@ public class Orders {
     private Timestamp createdAt;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="portfolio_id", nullable=false)
     private Portfolios portfolios;
 

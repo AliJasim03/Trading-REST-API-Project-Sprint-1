@@ -1,6 +1,7 @@
 package com.group418.StockProtfolioProject.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -25,9 +26,11 @@ public class Stocks {
     private Timestamp createdAt;
 
     @OneToMany(mappedBy = "stock")
+    @JsonIgnore
     private List<Orders> orders;
 
     @OneToMany(mappedBy = "stock")
+    @JsonIgnore
     private List<PriceHistory> priceHistory;
 
     public Stocks(){}
