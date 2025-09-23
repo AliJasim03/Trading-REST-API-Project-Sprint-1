@@ -44,7 +44,7 @@ public class Orders {
 
     public Orders(int orderId, double price, int volume, BuySellType buyOrSell, OrderType orderType, double fees, int statusCode, Timestamp createdAt, Portfolios portfolios, Stocks stock) {
         this.orderId = orderId;
-
+        this.price = price;
         this.volume = volume;
         this.buyOrSell = buyOrSell;
         this.orderType = orderType;
@@ -53,6 +53,14 @@ public class Orders {
         this.portfolios = portfolios;
         this.createdAt = new Timestamp(System.currentTimeMillis());
         this.stock = stock;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
     public double getPrice() {
@@ -81,6 +89,10 @@ public class Orders {
 
     public int getStatus_code() {
         return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 
     public BuySellType getBuy_or_sell() {
@@ -117,5 +129,13 @@ public class Orders {
 
     public void setStock(Stocks stock) {
         this.stock = stock;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -2,7 +2,8 @@ package com.group418.StockProtfolioProject.entity;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+
 
 @Entity
 public class PriceHistory {
@@ -12,7 +13,7 @@ public class PriceHistory {
     private int priceId;
     private double price;
     @Column(name = "created_at")
-    private Date createdAt;
+    private java.sql.Timestamp createdAt;
 
     @ManyToOne
     @JoinColumn(name="stock_id", nullable = false)
@@ -21,10 +22,19 @@ public class PriceHistory {
     public PriceHistory() {
     }
 
-    public PriceHistory(double price, Date created_at, Stocks stock) {
+    public PriceHistory(double price, Timestamp created_at, Stocks stock, int priceId) {
+        this.priceId = priceId;
         this.price = price;
         this.createdAt = created_at;
         this.stock = stock;
+    }
+
+    public int getPriceId() {
+        return priceId;
+    }
+
+    public void setPriceId(int priceId) {
+        this.priceId = priceId;
     }
 
     public double getPrice() {
@@ -35,11 +45,18 @@ public class PriceHistory {
         this.price = price;
     }
 
-    public Date getCreated_at() {
+    public java.sql.Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreated_at(Date created_at) {
-        this.createdAt = created_at;
+    public void setCreatedAt(java.sql.Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Stocks getStock() {
+        return stock;
+    }
+    public void setStock(Stocks stock) {
+        this.stock = stock;
     }
 }

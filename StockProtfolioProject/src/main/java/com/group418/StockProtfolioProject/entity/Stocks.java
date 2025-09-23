@@ -23,7 +23,7 @@ public class Stocks {
     private String isin; // International Securities Identification Number
     private String cusip; // Committee on Uniform Securities Identification Procedures
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private java.sql.Timestamp createdAt;
 
     @OneToMany(mappedBy = "stock")
     @JsonIgnore
@@ -45,10 +45,17 @@ public class Stocks {
         this.currency = currency;
         this.isin = isin;
         this.cusip = cusip;
-
-        this.createdAt = new Timestamp(System.currentTimeMillis());;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
         this.orders = orders;
         this.priceHistory = priceHistory;
+    }
+
+    public int getStockId() {
+        return stockId;
+    }
+
+    public void setStockId(int stockId) {
+        this.stockId = stockId;
     }
 
     public String getStockTicker() {
@@ -107,8 +114,28 @@ public class Stocks {
         this.cusip = cusip;
     }
 
-    public Timestamp getCreated_at() {
+    public java.sql.Timestamp getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(java.sql.Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<Orders> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Orders> orders) {
+        this.orders = orders;
+    }
+
+    public List<PriceHistory> getPriceHistory() {
+        return priceHistory;
+    }
+
+    public void setPriceHistory(List<PriceHistory> priceHistory) {
+        this.priceHistory = priceHistory; 
     }
 }
 
