@@ -8,6 +8,8 @@ import com.group418.StockProtfolioProject.repository.OrdersRepository;
 import com.group418.StockProtfolioProject.repository.StocksRepository;
 import com.group418.StockProtfolioProject.repository.PortfolioRepository;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -31,8 +33,9 @@ public class OrdersService {
         orders_request.setPortfolio(portfolios);
         orders_request.setStock(stock);
         orders_request.setStatus_code(0); // Pending
-        return ordersRepository.save(orders_request);
+        orders_request.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
+        return ordersRepository.save(orders_request);
     }
 
     public List<Orders> getTradingHistory(int portfolio_id) {
@@ -44,6 +47,7 @@ public class OrdersService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
     }
 
-
-
+    public List<Orders> getAllOrders() {
+        return ordersRepository.findAll();
+    }
 }

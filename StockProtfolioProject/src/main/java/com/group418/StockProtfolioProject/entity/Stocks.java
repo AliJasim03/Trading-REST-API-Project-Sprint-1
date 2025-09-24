@@ -2,6 +2,7 @@ package com.group418.StockProtfolioProject.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.group418.StockProtfolioProject.entity.PriceHistory;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
@@ -31,12 +32,12 @@ public class Stocks {
 
     @OneToMany(mappedBy = "stock")
     @JsonIgnore
-    private List<PriceHistory> priceHistory;
+    private List<com.group418.StockProtfolioProject.entity.PriceHistory> priceHistory;
 
     public Stocks(){}
 
 
-    public Stocks(int stockId, String stockSymbol, String stockName, String sector, String market, String currency, String isin, String cusip, Timestamp createdAt, List<Orders> orders, List<PriceHistory> priceHistory) {
+    public Stocks(int stockId, String stockSymbol, String stockName, String sector, String market, String currency, String isin, String cusip, Timestamp createdAt, List<Orders> orders, List<com.group418.StockProtfolioProject.entity.PriceHistory> priceHistory) {
         this.stockId = stockId;
         this.stockTicker = stockSymbol;
         this.stockName = stockName;
@@ -130,7 +131,7 @@ public class Stocks {
         this.orders = orders;
     }
 
-    public List<PriceHistory> getPriceHistory() {
+    public List<com.group418.StockProtfolioProject.entity.PriceHistory> getPriceHistory() {
         return priceHistory;
     }
 

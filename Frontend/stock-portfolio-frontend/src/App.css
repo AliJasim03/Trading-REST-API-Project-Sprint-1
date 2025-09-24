@@ -1,0 +1,104 @@
+/* Custom styles for the Stock Portfolio App */
+
+.App {
+    text-align: center;
+}
+
+/* Custom scrollbar for tables */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Focus states for better accessibility */
+.focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Table hover effects */
+.table-hover-row {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.table-hover-row:hover {
+    background-color: #f9fafb;
+}
+
+/* Card hover effects */
+.card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Status indicators */
+.status-pending {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom loading spinner */
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .mobile-full-width {
+        width: 100%;
+    }
+
+    .mobile-stack {
+        flex-direction: column;
+    }
+
+    .mobile-stack > * {
+        margin-bottom: 0.5rem;
+    }
+
+    .mobile-stack > *:last-child {
+        margin-bottom: 0;
+    }
+}

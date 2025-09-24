@@ -8,9 +8,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "http://localhost:3000")
 public class OrdersController {
 
     private final OrdersService ordersService;
+
     public OrdersController(OrdersService orderService) {
         this.ordersService = orderService;
     }
@@ -38,4 +40,10 @@ public class OrdersController {
         return ResponseEntity.ok(orders);
     }
 
+    // get all orders (useful for admin/debugging)
+    @GetMapping
+    public ResponseEntity<List<Orders>> getAllOrders() {
+        List<Orders> orders = ordersService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
 }
