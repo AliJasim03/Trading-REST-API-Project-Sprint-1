@@ -81,6 +81,24 @@ const apiService = {
         }
     },
 
+    updateOrderStatus: async (orderId, status) => {
+        try {
+            const response = await apiClient.put(`/orders/${orderId}/status?status=${status}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getAllOrders: async () => {
+        try {
+            const response = await apiClient.get('/orders');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // Additional endpoints for portfolios and stocks (we'll add these to backend)
     getAllPortfolios: async () => {
         try {

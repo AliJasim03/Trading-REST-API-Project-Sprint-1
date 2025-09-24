@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Portfolios from './pages/Portfolios';
 import PlaceOrder from './pages/PlaceOrder';
 import OrderStatus from './pages/OrderStatus';
+import ManageOrders from './pages/ManageOrders';
 import './App.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
                             <Route path="/portfolios" element={<Portfolios />} />
                             <Route path="/place-order" element={<PlaceOrder />} />
                             <Route path="/order-status" element={<OrderStatus />} />
+                            <Route path="/manage-orders" element={<ManageOrders />} />
                         </Routes>
                     </main>
                 </div>

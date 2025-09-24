@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Activity, Clock, CheckCircle, Plus, PieChart, Search } from 'lucide-react';
+import { Briefcase, Activity, Clock, CheckCircle, Plus, PieChart, Search, Settings } from 'lucide-react';
 import Card from '../components/ui/Card';
 import apiService from '../services/apiService';
 import Loading from '../components/ui/Loading';
@@ -155,6 +155,14 @@ const Dashboard = () => {
                             <Search className="text-primary-600 dark:text-primary-400 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
                             <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Check Order Status</h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">Track your order progress</p>
+                        </div>
+                    </Link>
+
+                    <Link to="/manage-orders" className="block">
+                        <div className="p-6 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all cursor-pointer group">
+                            <Settings className="text-primary-600 dark:text-primary-400 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Manage Orders</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">View and update all orders</p>
                         </div>
                     </Link>
                 </div>

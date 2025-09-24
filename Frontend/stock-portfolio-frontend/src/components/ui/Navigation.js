@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Briefcase, Plus, Search, Sun, Moon } from 'lucide-react';
+import { TrendingUp, Briefcase, Plus, Search, Settings, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 const Navigation = () => {
@@ -12,6 +12,7 @@ const Navigation = () => {
         { path: '/portfolios', label: 'Portfolios', icon: Briefcase },
         { path: '/place-order', label: 'Place Order', icon: Plus },
         { path: '/order-status', label: 'Order Status', icon: Search },
+        { path: '/manage-orders', label: 'Manage Orders', icon: Settings },
     ];
 
     const isActive = (path) => location.pathname === path;

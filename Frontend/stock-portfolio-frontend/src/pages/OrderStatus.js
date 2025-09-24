@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Clock, CheckCircle } from 'lucide-react';
+import { Search, Clock, CheckCircle, Edit3, Check, X } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -11,6 +11,8 @@ const OrderStatus = () => {
     const [orderData, setOrderData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [updating, setUpdating] = useState(false);
+    const [success, setSuccess] = useState(null);
 
     const handleSearch = async () => {
         if (!orderId.trim()) {
@@ -20,6 +22,7 @@ const OrderStatus = () => {
 
         setLoading(true);
         setError(null);
+        setSuccess(null);
         try {
             const order = await apiService.getOrderStatus(parseInt(orderId));
             setOrderData(order);
@@ -29,6 +32,30 @@ const OrderStatus = () => {
             setOrderData(null);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleUpdateStatus = async (newStatus) => {
+        if (!orderData) return;
+        
+        setUpdating(true);
+        setError(null);
+        setSuccess(null);
+        
+        try {
+            const updatedOrder = await apiService.updateOrderStatus(orderData.orderId, newStatus);
+            setOrderData(updatedOrder);
+            
+            const statusText = newStatus === 1 ? 'filled' : 'rejected';
+            setSuccess(`Order has been successfully ${statusText}.`);
+            
+            // Clear success message after 5 seconds
+            setTimeout(() => setSuccess(null), 5000);
+        } catch (err) {
+            console.error('Failed to update order status:', err);
+            setError(err.message);
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -120,6 +147,21 @@ const OrderStatus = () => {
                 </Card>
             )}
 
+            {/* Success Message */}
+            {success && (
+                <Card className="p-4 mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
+                    <div className="flex items-center text-green-700 dark:text-green-300">
+                        <div className="flex-shrink-0">
+                            <CheckCircle className="h-5 w-5" />
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium">Success</h3>
+                            <div className="mt-1 text-sm">{success}</div>
+                        </div>
+                    </div>
+                </Card>
+            )}
+
             {/* Order Details */}
             {orderData && (
                 <>
@@ -134,7 +176,40 @@ const OrderStatus = () => {
                             </div>
                             <StatusBadge status={orderData.status_code} className="text-sm px-3 py-1" />
                         </div>
-                        <p className="text-gray-600 dark:text-gray-400">{getStatusMessage(orderData.status_code)}</p>
+                        <p className="text-gray-600 dark:text-gray-400 mb-4">{getStatusMessage(orderData.status_code)}</p>
+                        
+                        {/* Admin Controls - Only show for pending orders */}
+                        {orderData.status_code === 0 && (
+                            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <h4 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                    <Edit3 className="w-4 h-4 mr-2" />
+                                    Admin Actions
+                                </h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                    Update the status of this pending order:
+                                </p>
+                                <div className="flex gap-3">
+                                    <Button 
+                                        onClick={() => handleUpdateStatus(1)} 
+                                        loading={updating}
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 text-white"
+                                    >
+                                        <Check className="w-4 h-4 mr-1" />
+                                        Mark as Filled
+                                    </Button>
+                                    <Button 
+                                        onClick={() => handleUpdateStatus(2)} 
+                                        loading={updating}
+                                        size="sm"
+                                        className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white"
+                                    >
+                                        <X className="w-4 h-4 mr-1" />
+                                        Mark as Rejected
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </Card>
 
                     {/* Detailed Information */}
