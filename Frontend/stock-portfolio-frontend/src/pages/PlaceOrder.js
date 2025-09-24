@@ -172,13 +172,13 @@ const PlaceOrder = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Place New Order</h1>
-                <p className="text-gray-600">Buy or sell stocks in your portfolios</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Place New Order</h1>
+                <p className="text-gray-600 dark:text-gray-400">Buy or sell stocks in your portfolios</p>
             </div>
 
             <Card className="p-6">
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6">
                         <div className="flex">
                             <div className="flex-shrink-0">
                                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -194,7 +194,7 @@ const PlaceOrder = () => {
                 )}
 
                 {success && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                    <div className="bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-6">
                         <div className="flex">
                             <div className="flex-shrink-0">
                                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -304,33 +304,33 @@ const PlaceOrder = () => {
 
                     {/* Order Summary */}
                     {orderData.price && orderData.volume && (
-                        <Card className="p-4 bg-gray-50 border-gray-200">
-                            <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
+                        <Card className="p-4 bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Order Summary</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                 <div>
                                     <div className="flex justify-between mb-2">
-                                        <span className="text-gray-600">Order Value:</span>
-                                        <span className="font-medium">${orderValue.toFixed(2)}</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Order Value:</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">${orderValue.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Transaction Fees:</span>
-                                        <span className="font-medium">${parseFloat(orderData.fees || 0).toFixed(2)}</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Transaction Fees:</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">${parseFloat(orderData.fees || 0).toFixed(2)}</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="flex justify-between mb-2">
-                                        <span className="text-gray-600">Shares:</span>
-                                        <span className="font-medium">{orderData.volume} shares</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Shares:</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">{orderData.volume} shares</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Price per Share:</span>
-                                        <span className="font-medium">${parseFloat(orderData.price || 0).toFixed(2)}</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Price per Share:</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">${parseFloat(orderData.price || 0).toFixed(2)}</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex justify-between text-lg border-t pt-2 md:border-t-0 md:pt-0">
-                                        <span className="font-semibold text-gray-900">Total Cost:</span>
-                                        <span className="font-bold text-gray-900">${totalCost.toFixed(2)}</span>
+                                    <div className="flex justify-between text-lg border-t pt-2 md:border-t-0 md:pt-0 border-gray-300 dark:border-gray-600">
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100">Total Cost:</span>
+                                        <span className="font-bold text-gray-900 dark:text-gray-100">${totalCost.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>

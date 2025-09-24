@@ -10,8 +10,8 @@ const Loading = ({ size = "default", text = "" }) => {
 
     return (
         <div className="flex flex-col justify-center items-center py-8">
-            <Loader2 className={`animate-spin text-primary-600 ${sizeClasses[size]}`} />
-            {text && <p className="mt-2 text-gray-600 text-sm">{text}</p>}
+            <Loader2 className={`animate-spin text-primary-600 dark:text-primary-400 ${sizeClasses[size]}`} />
+            {text && <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm">{text}</p>}
         </div>
     );
 };

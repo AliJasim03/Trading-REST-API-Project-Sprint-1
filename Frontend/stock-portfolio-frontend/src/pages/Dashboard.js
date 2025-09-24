@@ -65,13 +65,13 @@ const Dashboard = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolio Dashboard</h1>
-                <p className="text-gray-600">Manage your investment portfolios and track your trading activity</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Dashboard</h1>
+                <p className="text-gray-600 dark:text-gray-400">Manage your investment portfolios and track your trading activity</p>
             </div>
 
             {error && (
-                <Card className="p-4 mb-6 border-red-200 bg-red-50">
-                    <div className="flex items-center text-red-700">
+                <Card className="p-4 mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+                    <div className="flex items-center text-red-700 dark:text-red-300">
                         <div className="text-sm">
                             <strong>Error loading dashboard:</strong> {error}
                         </div>
@@ -83,48 +83,48 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <Card className="p-6 hover:shadow-xl transition-shadow">
                     <div className="flex items-center">
-                        <div className="p-3 bg-primary-100 rounded-full">
-                            <Briefcase className="text-primary-600 w-6 h-6" />
+                        <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-full">
+                            <Briefcase className="text-primary-600 dark:text-primary-400 w-6 h-6" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Total Portfolios</p>
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalPortfolios}</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Portfolios</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.totalPortfolios}</p>
                         </div>
                     </div>
                 </Card>
 
                 <Card className="p-6 hover:shadow-xl transition-shadow">
                     <div className="flex items-center">
-                        <div className="p-3 bg-blue-100 rounded-full">
-                            <Activity className="text-blue-600 w-6 h-6" />
+                        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                            <Activity className="text-blue-600 dark:text-blue-400 w-6 h-6" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.totalOrders}</p>
                         </div>
                     </div>
                 </Card>
 
                 <Card className="p-6 hover:shadow-xl transition-shadow">
                     <div className="flex items-center">
-                        <div className="p-3 bg-yellow-100 rounded-full">
-                            <Clock className="text-yellow-600 w-6 h-6" />
+                        <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                            <Clock className="text-yellow-600 dark:text-yellow-400 w-6 h-6" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Pending Orders</p>
-                            <p className="text-2xl font-bold text-gray-900">{stats.pendingOrders}</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Orders</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.pendingOrders}</p>
                         </div>
                     </div>
                 </Card>
 
                 <Card className="p-6 hover:shadow-xl transition-shadow">
                     <div className="flex items-center">
-                        <div className="p-3 bg-green-100 rounded-full">
-                            <CheckCircle className="text-green-600 w-6 h-6" />
+                        <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+                            <CheckCircle className="text-green-600 dark:text-green-400 w-6 h-6" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Filled Orders</p>
-                            <p className="text-2xl font-bold text-gray-900">{stats.filledOrders}</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Filled Orders</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.filledOrders}</p>
                         </div>
                     </div>
                 </Card>
@@ -132,29 +132,29 @@ const Dashboard = () => {
 
             {/* Quick Actions */}
             <Card className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Link to="/place-order" className="block">
-                        <div className="p-6 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer group">
-                            <Plus className="text-primary-600 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
-                            <h3 className="font-semibold text-gray-900 mb-1">Place New Order</h3>
-                            <p className="text-sm text-gray-600">Buy or sell stocks in your portfolios</p>
+                        <div className="p-6 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all cursor-pointer group">
+                            <Plus className="text-primary-600 dark:text-primary-400 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Place New Order</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Buy or sell stocks in your portfolios</p>
                         </div>
                     </Link>
 
                     <Link to="/portfolios" className="block">
-                        <div className="p-6 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer group">
-                            <PieChart className="text-primary-600 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
-                            <h3 className="font-semibold text-gray-900 mb-1">View Portfolios</h3>
-                            <p className="text-sm text-gray-600">Manage and track your portfolios</p>
+                        <div className="p-6 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all cursor-pointer group">
+                            <PieChart className="text-primary-600 dark:text-primary-400 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">View Portfolios</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Manage and track your portfolios</p>
                         </div>
                     </Link>
 
                     <Link to="/order-status" className="block">
-                        <div className="p-6 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer group">
-                            <Search className="text-primary-600 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
-                            <h3 className="font-semibold text-gray-900 mb-1">Check Order Status</h3>
-                            <p className="text-sm text-gray-600">Track your order progress</p>
+                        <div className="p-6 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all cursor-pointer group">
+                            <Search className="text-primary-600 dark:text-primary-400 w-8 h-8 mb-3 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Check Order Status</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Track your order progress</p>
                         </div>
                     </Link>
                 </div>

@@ -82,13 +82,13 @@ const Portfolios = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolio Management</h1>
-                <p className="text-gray-600">View and manage your investment portfolios</p>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Management</h1>
+                <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios</p>
             </div>
 
             {error && (
-                <Card className="p-4 mb-6 border-red-200 bg-red-50">
-                    <div className="flex items-center text-red-700">
+                <Card className="p-4 mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+                    <div className="flex items-center text-red-700 dark:text-red-300">
                         <div className="text-sm">
                             <strong>Error:</strong> {error}
                         </div>
@@ -98,9 +98,9 @@ const Portfolios = () => {
 
             {/* Portfolio Selector */}
             <Card className="p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Portfolio</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
                 {portfolios.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                         <p>No portfolios found. Please check your backend connection.</p>
                     </div>
                 ) : (
@@ -110,14 +110,14 @@ const Portfolios = () => {
                                 key={portfolio.portfolioId}
                                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
                                     selectedPortfolio?.portfolioId === portfolio.portfolioId
-                                        ? 'border-primary-500 bg-primary-50 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-md'
+                                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                                 }`}
                                 onClick={() => setSelectedPortfolio(portfolio)}
                             >
-                                <h3 className="font-semibold text-gray-900 mb-1">{portfolio.portfolioName}</h3>
-                                <p className="text-sm text-gray-600 mb-1">{portfolio.description}</p>
-                                <div className="text-xs text-gray-500 space-y-1">
+                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{portfolio.portfolioName}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{portfolio.description}</p>
+                                <div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">
                                     <p>Capital: ${portfolio.initialCapital?.toLocaleString() || '0'}</p>
                                     <p>Created: {new Date(portfolio.createdAt).toLocaleDateString()}</p>
                                 </div>
@@ -132,43 +132,43 @@ const Portfolios = () => {
                 <Card className="p-6 mb-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Portfolio Details</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Portfolio Details</h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Name:</span>
-                                    <span className="font-medium">{selectedPortfolio.portfolioName}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Name:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">{selectedPortfolio.portfolioName}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Description:</span>
-                                    <span className="font-medium text-right">{selectedPortfolio.description}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Description:</span>
+                                    <span className="font-medium text-right text-gray-900 dark:text-gray-100">{selectedPortfolio.description}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Initial Capital:</span>
-                                    <span className="font-medium">${selectedPortfolio.initialCapital?.toLocaleString() || '0'}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Initial Capital:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">${selectedPortfolio.initialCapital?.toLocaleString() || '0'}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Created:</span>
-                                    <span className="font-medium">{new Date(selectedPortfolio.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Created:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">{new Date(selectedPortfolio.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Trading Activity</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Trading Activity</h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Total Orders:</span>
-                                    <span className="font-medium">{tradingHistory.length}</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Total Orders:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">{tradingHistory.length}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Pending:</span>
-                                    <span className="font-medium text-yellow-600">
+                                    <span className="text-gray-600 dark:text-gray-400">Pending:</span>
+                                    <span className="font-medium text-yellow-600 dark:text-yellow-400">
                     {tradingHistory.filter(order => order.status_code === 0).length}
                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Filled:</span>
-                                    <span className="font-medium text-green-600">
+                                    <span className="text-gray-600 dark:text-gray-400">Filled:</span>
+                                    <span className="font-medium text-green-600 dark:text-green-400">
                     {tradingHistory.filter(order => order.status_code === 1).length}
                   </span>
                                 </div>
@@ -176,17 +176,17 @@ const Portfolios = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Stats</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Stats</h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Order Volume:</span>
-                                    <span className="font-medium">
+                                    <span className="text-gray-600 dark:text-gray-400">Order Volume:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">
                     {tradingHistory.reduce((sum, order) => sum + (order.volume || 0), 0)} shares
                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Total Fees:</span>
-                                    <span className="font-medium">
+                                    <span className="text-gray-600 dark:text-gray-400">Total Fees:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">
                     ${tradingHistory.reduce((sum, order) => sum + (order.fees || 0), 0).toFixed(2)}
                   </span>
                                 </div>
@@ -200,7 +200,7 @@ const Portfolios = () => {
             {selectedPortfolio && (
                 <Card className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900">Trading History</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Trading History</h2>
                         <Button onClick={loadTradingHistory} loading={historyLoading} size="sm">
                             <RefreshCw className="w-4 h-4" />
                             Refresh
@@ -208,7 +208,7 @@ const Portfolios = () => {
                     </div>
 
                     {historyError && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
                             Error loading trading history: {historyError}
                         </div>
                     )}
@@ -216,9 +216,9 @@ const Portfolios = () => {
                     {historyLoading ? (
                         <Loading text="Loading trading history..." />
                     ) : tradingHistory.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <RefreshCw className="w-8 h-8 text-gray-400" />
+                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <RefreshCw className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                             </div>
                             <p className="text-lg font-medium mb-2">No trading history found</p>
                             <p className="text-sm">This portfolio doesn't have any orders yet.</p>
@@ -227,70 +227,70 @@ const Portfolios = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full table-auto">
                                 <thead>
-                                <tr className="bg-gray-50 border-b">
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <tr className="bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-600">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Order ID
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Stock
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Type
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Price
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Volume
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Total
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Fees
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Date
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
                                 {tradingHistory.map((order) => (
-                                    <tr key={order.orderId} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr key={order.orderId} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                             #{order.orderId}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {getStockInfo(order.stock?.stockId)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             order.buy_or_sell === 'BUY'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                         }`}>
                           {order.buy_or_sell}
                         </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             ${order.price?.toFixed(2) || '0.00'}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             {order.volume || 0}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             ${((order.price || 0) * (order.volume || 0)).toFixed(2)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                             ${order.fees?.toFixed(2) || '0.00'}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <StatusBadge status={order.status_code} />
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                             {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                                         </td>
                                     </tr>
