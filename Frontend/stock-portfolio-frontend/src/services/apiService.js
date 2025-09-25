@@ -135,6 +135,43 @@ const apiService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    // Portfolio Analytics APIs
+    getPortfolioSummary: async () => {
+        try {
+            const response = await apiClient.get('/portfolios/summary');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getPortfolioDashboard: async (portfolioId) => {
+        try {
+            const response = await apiClient.get(`/portfolios/${portfolioId}/dashboard`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getPortfolioPerformance: async (portfolioId) => {
+        try {
+            const response = await apiClient.get(`/portfolios/${portfolioId}/performance`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getPortfolioAllocation: async (portfolioId) => {
+        try {
+            const response = await apiClient.get(`/portfolios/${portfolioId}/allocation`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 

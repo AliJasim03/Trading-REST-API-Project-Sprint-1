@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Briefcase, Activity, Clock, CheckCircle, Plus, PieChart, Search, Settings, TrendingUp, DollarSign, Target } from 'lucide-react';
 import Card from '../components/ui/Card';
+import StatCard from '../components/ui/StatCard';
 import apiService from '../services/apiService';
 import Loading from '../components/ui/Loading';
 
@@ -138,105 +139,58 @@ const Dashboard = () => {
 
             {/* Portfolio Performance Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                            <DollarSign className="text-blue-600 dark:text-blue-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Portfolio Value</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{formatCurrency(totalStats.totalValue)}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={DollarSign}
+                    title="Total Portfolio Value"
+                    value={formatCurrency(totalStats.totalValue)}
+                    iconColor="blue"
+                />
 
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-                            <Target className="text-green-600 dark:text-green-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Capital</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{formatCurrency(totalStats.totalCapital)}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Target}
+                    title="Total Capital"
+                    value={formatCurrency(totalStats.totalCapital)}
+                    iconColor="green"
+                />
 
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className={`p-3 rounded-full ${totalStats.totalGainLoss >= 0 
-                            ? 'bg-green-100 dark:bg-green-900/30' 
-                            : 'bg-red-100 dark:bg-red-900/30'}`}>
-                            <TrendingUp className={`w-6 h-6 ${totalStats.totalGainLoss >= 0 
-                                ? 'text-green-600 dark:text-green-400' 
-                                : 'text-red-600 dark:text-red-400'}`} />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Gain/Loss</p>
-                            <p className={`text-2xl font-bold ${totalStats.totalGainLoss >= 0 
-                                ? 'text-green-600 dark:text-green-400' 
-                                : 'text-red-600 dark:text-red-400'}`}>
-                                {formatCurrency(totalStats.totalGainLoss)}
-                            </p>
-                            <p className={`text-sm ${totalStats.totalGainLoss >= 0 
-                                ? 'text-green-600 dark:text-green-400' 
-                                : 'text-red-600 dark:text-red-400'}`}>
-                                {formatPercent(totalStats.totalGainLossPercent)}
-                            </p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={TrendingUp}
+                    title="Total Gain/Loss"
+                    value={formatCurrency(totalStats.totalGainLoss)}
+                    subtitle={formatPercent(totalStats.totalGainLossPercent)}
+                    gainLossValue={totalStats.totalGainLoss}
+                />
 
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-full">
-                            <Briefcase className="text-primary-600 dark:text-primary-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Portfolios</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.totalPortfolios}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Briefcase}
+                    title="Total Portfolios"
+                    value={stats.totalPortfolios}
+                    iconColor="primary"
+                />
             </div>
 
             {/* Order Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                            <Activity className="text-blue-600 dark:text-blue-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.totalOrders}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Activity}
+                    title="Total Orders"
+                    value={stats.totalOrders}
+                    iconColor="blue"
+                />
 
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-                            <Clock className="text-yellow-600 dark:text-yellow-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Orders</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.pendingOrders}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Clock}
+                    title="Pending Orders"
+                    value={stats.pendingOrders}
+                    iconColor="yellow"
+                />
 
-                <Card className="p-6 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center">
-                        <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-                            <CheckCircle className="text-green-600 dark:text-green-400 w-6 h-6" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Filled Orders</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.filledOrders}</p>
-                        </div>
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={CheckCircle}
+                    title="Filled Orders"
+                    value={stats.filledOrders}
+                    iconColor="green"
+                />
             </div>
 
             {/* Portfolio Summary */}
@@ -244,7 +198,7 @@ const Dashboard = () => {
                 <Card className="p-6 mb-8">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Portfolio Summary</h2>
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -264,7 +218,7 @@ const Dashboard = () => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {portfolioSummary.map((portfolio) => (
                                     <tr key={portfolio.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -285,7 +239,7 @@ const Dashboard = () => {
                                             {formatCurrency(portfolio.totalCapital)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {portfolio.holdingsCount}
+                                            {portfolio.holdingsCount || 0}
                                         </td>
                                     </tr>
                                 ))}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Settings, Check, X, Clock, CheckCircle, RefreshCw } from 'lucide-react';
 import Card from '../components/ui/Card';
+import StatCard from '../components/ui/StatCard';
 import Button from '../components/ui/Button';
 import StatusBadge from '../components/ui/StatusBadge';
 import apiService from '../services/apiService';
@@ -126,45 +127,37 @@ const ManageOrders = () => {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Card className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
-                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{orders.length}</p>
-                        </div>
-                        <Settings className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Settings}
+                    title="Total Orders"
+                    value={orders.length}
+                    iconColor="gray"
+                    iconSize="w-8 h-8"
+                />
 
-                <Card className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
-                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{pendingCount}</p>
-                        </div>
-                        <Clock className="w-8 h-8 text-yellow-400 dark:text-yellow-500" />
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={Clock}
+                    title="Pending"
+                    value={pendingCount}
+                    iconColor="yellow"
+                    iconSize="w-8 h-8"
+                />
 
-                <Card className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Filled</p>
-                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{filledCount}</p>
-                        </div>
-                        <CheckCircle className="w-8 h-8 text-green-400 dark:text-green-500" />
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={CheckCircle}
+                    title="Filled"
+                    value={filledCount}
+                    iconColor="green"
+                    iconSize="w-8 h-8"
+                />
 
-                <Card className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Rejected</p>
-                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{rejectedCount}</p>
-                        </div>
-                        <X className="w-8 h-8 text-red-400 dark:text-red-500" />
-                    </div>
-                </Card>
+                <StatCard 
+                    icon={X}
+                    title="Rejected"
+                    value={rejectedCount}
+                    iconColor="red"
+                    iconSize="w-8 h-8"
+                />
             </div>
 
             {/* Filters and Controls */}
