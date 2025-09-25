@@ -46,4 +46,11 @@ public class OrdersController {
         List<Orders> orders = ordersService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
+
+    // update order status
+    @PutMapping("/{order_id}/status")
+    public ResponseEntity<Orders> updateOrderStatus(@PathVariable Integer order_id, @RequestParam Integer status) {
+        Orders updatedOrder = ordersService.updateOrderStatus(order_id, status);
+        return ResponseEntity.ok(updatedOrder);
+    }
 }
