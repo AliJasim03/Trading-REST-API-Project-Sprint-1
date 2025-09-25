@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, TrendingUp, DollarSign, PieChart, Target } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Loading from '../components/ui/Loading';
@@ -11,10 +11,13 @@ const Portfolios = () => {
     const [stocks, setStocks] = useState([]);
     const [selectedPortfolio, setSelectedPortfolio] = useState(null);
     const [tradingHistory, setTradingHistory] = useState([]);
+    const [portfolioDashboard, setPortfolioDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [historyLoading, setHistoryLoading] = useState(false);
+    const [dashboardLoading, setDashboardLoading] = useState(false);
     const [error, setError] = useState(null);
     const [historyError, setHistoryError] = useState(null);
+    const [dashboardError, setDashboardError] = useState(null);
 
     useEffect(() => {
         loadInitialData();
@@ -23,6 +26,7 @@ const Portfolios = () => {
     useEffect(() => {
         if (selectedPortfolio) {
             loadTradingHistory();
+            loadPortfolioDashboard();
         }
     }, [selectedPortfolio]);
 
@@ -66,9 +70,37 @@ const Portfolios = () => {
         }
     };
 
+    const loadPortfolioDashboard = async () => {
+        if (!selectedPortfolio) return;
+
+        setDashboardLoading(true);
+        setDashboardError(null);
+        try {
+            const dashboard = await apiService.getPortfolioDashboard(selectedPortfolio.portfolioId);
+            setPortfolioDashboard(dashboard);
+        } catch (err) {
+            console.error('Failed to load portfolio dashboard:', err);
+            setDashboardError(err.message);
+        } finally {
+            setDashboardLoading(false);
+        }
+    };
+
     const getStockInfo = (stockId) => {
         const stock = stocks.find(s => s.stockId === stockId);
         return stock ? `${stock.stockTicker} - ${stock.stockName}` : `Stock ID: ${stockId}`;
+    };
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(value || 0);
+    };
+
+    const formatPercent = (value) => {
+        return `${(value || 0).toFixed(2)}%`;
     };
 
     if (loading) {
@@ -83,7 +115,7 @@ const Portfolios = () => {
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Management</h1>
-                <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios</p>
+                <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios with detailed analytics</p>
             </div>
 
             {error && (
@@ -126,6 +158,169 @@ const Portfolios = () => {
                     </div>
                 )}
             </Card>
+
+            {/* Portfolio Analytics Dashboard */}
+            {selectedPortfolio && (
+                <Card className="p-6 mb-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Portfolio Analytics</h2>
+                        <Button onClick={loadPortfolioDashboard} loading={dashboardLoading} size="sm">
+                            <RefreshCw className="w-4 h-4" />
+                            Refresh
+                        </Button>
+                    </div>
+
+                    {dashboardError && (
+                        <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
+                            Error loading portfolio analytics: {dashboardError}
+                        </div>
+                    )}
+
+                    {dashboardLoading ? (
+                        <Loading text="Loading analytics..." />
+                    ) : portfolioDashboard ? (
+                        <>
+                            {/* Performance Metrics */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                                    <div className="flex items-center">
+                                        <DollarSign className="text-blue-600 dark:text-blue-400 w-8 h-8 mr-3" />
+                                        <div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                                {formatCurrency(portfolioDashboard.totalValue)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                                    <div className="flex items-center">
+                                        <Target className="text-green-600 dark:text-green-400 w-8 h-8 mr-3" />
+                                        <div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Available Capital</p>
+                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                                {formatCurrency(portfolioDashboard.availableCapital)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                                    <div className="flex items-center">
+                                        <PieChart className="text-purple-600 dark:text-purple-400 w-8 h-8 mr-3" />
+                                        <div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Capital</p>
+                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                                {formatCurrency(portfolioDashboard.totalCapital)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className={`p-4 rounded-lg ${
+                                    (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
+                                        ? 'bg-green-50 dark:bg-green-900/20' 
+                                        : 'bg-red-50 dark:bg-red-900/20'
+                                }`}>
+                                    <div className="flex items-center">
+                                        <TrendingUp className={`w-8 h-8 mr-3 ${
+                                            (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
+                                                ? 'text-green-600 dark:text-green-400' 
+                                                : 'text-red-600 dark:text-red-400'
+                                        }`} />
+                                        <div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Gain/Loss</p>
+                                            <p className={`text-xl font-bold ${
+                                                (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
+                                                    ? 'text-green-600 dark:text-green-400' 
+                                                    : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {formatCurrency(portfolioDashboard.performance?.totalGainLoss)}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
+                                                    ? 'text-green-600 dark:text-green-400' 
+                                                    : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {formatPercent(portfolioDashboard.performance?.gainLossPercent)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Holdings Allocation */}
+                            {portfolioDashboard.allocation && portfolioDashboard.allocation.length > 0 && (
+                                <div className="mb-8">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Holdings Allocation</h3>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                                            <thead className="bg-gray-50 dark:bg-gray-700">
+                                                <tr>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Stock
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Quantity
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Current Price
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Value
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                        Allocation %
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                                                {portfolioDashboard.allocation.map((holding, index) => (
+                                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                {holding.stockSymbol}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                                {holding.stockName}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {holding.quantity}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {formatCurrency(holding.currentPrice)}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            {formatCurrency(holding.value)}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                            <div className="flex items-center">
+                                                                <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
+                                                                    <div 
+                                                                        className="bg-primary-600 h-2 rounded-full" 
+                                                                        style={{ width: `${Math.min(holding.percentage, 100)}%` }}
+                                                                    ></div>
+                                                                </div>
+                                                                <span>{formatPercent(holding.percentage)}</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <p>No analytics data available for this portfolio.</p>
+                        </div>
+                    )}
+                </Card>
+            )}
 
             {/* Portfolio Details */}
             {selectedPortfolio && (
@@ -188,6 +383,12 @@ const Portfolios = () => {
                                     <span className="text-gray-600 dark:text-gray-400">Total Fees:</span>
                                     <span className="font-medium text-gray-900 dark:text-gray-100">
                     ${tradingHistory.reduce((sum, order) => sum + (order.fees || 0), 0).toFixed(2)}
+                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">Holdings Count:</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {portfolioDashboard?.totalHoldings || 0}
                   </span>
                                 </div>
                             </div>
