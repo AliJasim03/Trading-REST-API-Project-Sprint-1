@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Settings, Check, X, Clock, CheckCircle, Refresh } from 'lucide-react';
+import { Search, Settings, Check, X, Clock, CheckCircle, RefreshCw } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import StatusBadge from '../components/ui/StatusBadge';
@@ -195,7 +195,7 @@ const ManageOrders = () => {
                     </div>
                     
                     <Button onClick={loadAllOrders} loading={loading}>
-                        <Refresh className="w-4 h-4 mr-2" />
+                        <RefreshCw className="w-4 h-4 mr-2" />
                         Refresh
                     </Button>
                 </div>

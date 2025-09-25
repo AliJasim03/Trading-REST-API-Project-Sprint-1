@@ -50,6 +50,17 @@ CREATE TABLE price_history (
     FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE
 );
 
+CREATE TABLE holdings (
+    holding_id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,            -- Current number of shares held
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (portfolio_id) REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stocks(stock_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_portfolio_stock (portfolio_id, stock_id)
+);
+
 
 INSERT INTO portfolios (portfolio_name, description, portfolio_type, risk_profile, initial_capital)
 VALUES
