@@ -11,9 +11,9 @@ const Navigation = () => {
         { path: '/', label: 'Dashboard', icon: TrendingUp },
         { path: '/portfolios', label: 'Portfolios', icon: Briefcase },
         { path: '/live-prices', label: 'Live Prices', icon: Activity }, // Add this menu item
-        { path: '/place-order', label: 'Place Order', icon: Plus },
-        { path: '/order-status', label: 'Order Status', icon: Search },
-        { path: '/manage-orders', label: 'Manage Orders', icon: Settings },
+        // { path: '/place-order', label: 'Place Order', icon: Plus },
+        // { path: '/order-status', label: 'Order Status', icon: Search },
+        // { path: '/manage-orders', label: 'Manage Orders', icon: Settings },
     ];
 
     const isActive = (path) => location.pathname === path;

@@ -4,6 +4,7 @@ import PortfolioAnalytics from '../components/portfolio/PortfolioAnalytics';
 import TradingHistory from '../components/portfolio/TradingHistory';
 import HoldingsAllocation from '../components/portfolio/HoldingsAllocation';
 import apiService from '../services/apiService';
+import QuickActions from '../components/ui/QuickActions';
 const Portfolios = () => {
     const [portfolios, setPortfolios] = useState([]);
     const [selectedPortfolio, setSelectedPortfolio] = useState(null);
@@ -69,10 +70,16 @@ const Portfolios = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Management</h1>
-                <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios with detailed analytics</p>
-            </div>
+             <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Management</h1>
+                                <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios with detailed analytics</p>
+                            </div>
+                            
+                            {/* Quick Actions - Icon Buttons with Tooltips */}
+                            <QuickActions />
+                        </div>
+         
 
             <PortfolioSelector 
                 portfolios={portfolios}

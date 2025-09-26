@@ -9,6 +9,7 @@ import Loading from '../components/ui/Loading';
 import OrderPerformanceStats from '../components/dashboard/OrderPerformanceStats';
 import PortfolioSummary from '../components/dashboard/PortfolioSummary';
 import PortfolioPerformanceStats from '../components/dashboard/PortfolioPerformanceStats';
+import QuickActions from '../components/ui/QuickActions';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -121,39 +122,7 @@ const Dashboard = () => {
                 </div>
                 
                 {/* Quick Actions - Icon Buttons with Tooltips */}
-                <div className="flex items-center space-x-3">
-                    <Tooltip content="Place New Order" position="bottom">
-                        <Link to="/place-order">
-                            <button className="p-3 rounded-lg bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400 transition-all hover:scale-105 active:scale-95">
-                                <Plus className="w-5 h-5" />
-                            </button>
-                        </Link>
-                    </Tooltip>
-                    
-                    <Tooltip content="View Portfolios" position="bottom">
-                        <Link to="/portfolios">
-                            <button className="p-3 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400 transition-all hover:scale-105 active:scale-95">
-                                <PieChart className="w-5 h-5" />
-                            </button>
-                        </Link>
-                    </Tooltip>
-                    
-                    <Tooltip content="Check Order Status" position="bottom">
-                        <Link to="/order-status">
-                            <button className="p-3 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 dark:text-green-400 transition-all hover:scale-105 active:scale-95">
-                                <Search className="w-5 h-5" />
-                            </button>
-                        </Link>
-                    </Tooltip>
-                    
-                    <Tooltip content="Manage Orders" position="bottom">
-                        <Link to="/manage-orders">
-                            <button className="p-3 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-800/50 text-purple-600 dark:text-purple-400 transition-all hover:scale-105 active:scale-95">
-                                <Settings className="w-5 h-5" />
-                            </button>
-                        </Link>
-                    </Tooltip>
-                </div>
+                <QuickActions />
             </div>
 
             {error && (
