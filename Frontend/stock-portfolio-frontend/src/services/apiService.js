@@ -99,7 +99,7 @@ const apiService = {
         }
     },
 
-    // Additional endpoints for portfolios and stocks (we'll add these to backend)
+    // Portfolios API
     getAllPortfolios: async () => {
         try {
             const response = await apiClient.get('/portfolios');
@@ -109,28 +109,9 @@ const apiService = {
         }
     },
 
-    getAllStocks: async () => {
-        try {
-            const response = await apiClient.get('/stocks');
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
     getPortfolioById: async (portfolioId) => {
         try {
             const response = await apiClient.get(`/portfolios/${portfolioId}`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    // Price history
-    getPriceHistory: async (stockId) => {
-        try {
-            const response = await apiClient.get(`/stocks/${stockId}/price-history`);
             return response.data;
         } catch (error) {
             throw error;
@@ -172,7 +153,86 @@ const apiService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    // Stocks API
+    getAllStocks: async () => {
+        try {
+            const response = await apiClient.get('/stocks');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Price history
+    getPriceHistory: async (stockId) => {
+        try {
+            const response = await apiClient.get(`/stocks/${stockId}/price-history`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 
+// Live Prices API Service
+const livePriceService = {
+    getCurrentPrice: async (symbol) => {
+        try {
+            const response = await apiClient.get(`/api/live-prices/${symbol}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getMultiplePrices: async (symbols) => {
+        try {
+            const response = await apiClient.post('/api/live-prices/batch', symbols);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getPopularStocks: async () => {
+        try {
+            const response = await apiClient.get('/api/live-prices/popular');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getHistoricalData: async (symbol, period = 'daily') => {
+        try {
+            const response = await apiClient.get(`/api/live-prices/${symbol}/history?period=${period}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getIntradayData: async (symbol) => {
+        try {
+            const response = await apiClient.get(`/api/live-prices/${symbol}/intraday`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    searchStocks: async (query) => {
+        try {
+            const response = await apiClient.get(`/api/live-prices/search?q=${encodeURIComponent(query)}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+};
+
+// Export both services
 export default apiService;
+export { livePriceService as livePrices };

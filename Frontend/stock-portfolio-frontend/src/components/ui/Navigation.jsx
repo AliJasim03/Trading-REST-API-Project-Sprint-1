@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Briefcase, Plus, Search, Settings, Sun, Moon } from 'lucide-react';
+import { TrendingUp, Briefcase, Plus, Search, Settings, Sun, Moon, Activity } from 'lucide-react'; // Add Activity icon
 import { useTheme } from '../../context/ThemeContext';
 
 const Navigation = () => {
@@ -10,6 +10,7 @@ const Navigation = () => {
     const navItems = [
         { path: '/', label: 'Dashboard', icon: TrendingUp },
         { path: '/portfolios', label: 'Portfolios', icon: Briefcase },
+        { path: '/live-prices', label: 'Live Prices', icon: Activity }, // Add this menu item
         { path: '/place-order', label: 'Place Order', icon: Plus },
         { path: '/order-status', label: 'Order Status', icon: Search },
         { path: '/manage-orders', label: 'Manage Orders', icon: Settings },
@@ -45,7 +46,7 @@ const Navigation = () => {
                                 </Link>
                             );
                         })}
-                        
+
                         {/* Theme Toggle Button */}
                         <button
                             onClick={toggleTheme}
