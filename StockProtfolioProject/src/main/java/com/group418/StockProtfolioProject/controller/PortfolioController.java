@@ -31,7 +31,7 @@ public class PortfolioController {
         return ResponseEntity.ok(portfolio);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Portfolios> createPortfolio(@RequestBody Portfolios portfolio) {
         Portfolios createdPortfolio = portfolioService.createPortfolio(portfolio);
         return ResponseEntity.ok(createdPortfolio);

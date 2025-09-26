@@ -1,7 +1,8 @@
-import React from 'react';
-import { Briefcase } from 'lucide-react';
+import React, { useState } from 'react';
+import { Briefcase, Plus } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import CreatePortfolioDialog from '../dialog/CreatePortfolioDialog';
 
 const PortfolioSelector = ({ 
     portfolios, 
@@ -9,8 +10,25 @@ const PortfolioSelector = ({
     onPortfolioSelect, 
     loading, 
     error,
-    onRefresh 
+    onRefresh,
+    onPortfolioCreated 
 }) => {
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+    const handlePortfolioCreated = (newPortfolio) => {
+        // Close the dialog
+        setIsCreateDialogOpen(false);
+        
+        // Call the parent callback to refresh portfolios
+        if (onPortfolioCreated) {
+            onPortfolioCreated(newPortfolio);
+        }
+        
+        // Optionally refresh the portfolio list
+        if (onRefresh) {
+            onRefresh();
+        }
+    };
     if (loading) {
         return (
             <Card className="p-6 mb-8">
@@ -44,7 +62,17 @@ const PortfolioSelector = ({
 
     return (
         <Card className="p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
+          <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
+              <button 
+                  onClick={() => setIsCreateDialogOpen(true)} 
+                  className="p-3 rounded-lg bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400 transition-all hover:scale-105 active:scale-95"
+                  title="Create New Portfolio"
+              >
+                  <Plus className="w-5 h-5" />
+              </button>
+          </div>
+          
             
             {portfolios.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -84,6 +112,13 @@ const PortfolioSelector = ({
                     ))}
                 </div>
             )}
+            
+            {/* Create Portfolio Dialog */}
+            <CreatePortfolioDialog
+                isOpen={isCreateDialogOpen}
+                onClose={() => setIsCreateDialogOpen(false)}
+                onPortfolioCreated={handlePortfolioCreated}
+            />
         </Card>
     );
 };

@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import StatusBadge from '../components/ui/StatusBadge';
 import apiService from '../services/apiService';
+import QuickActions from '../components/ui/QuickActions';
 
 const OrderStatus = () => {
     const [orderId, setOrderId] = useState('');
@@ -101,10 +102,17 @@ const OrderStatus = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Order Status</h1>
-                <p className="text-gray-600 dark:text-gray-400">Check the status and details of your orders</p>
-            </div>
+            
+              <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Order Status</h1>
+                                <p className="text-gray-600 dark:text-gray-400">Check the status and details of your orders</p>
+                            </div>
+                            
+                            {/* Quick Actions - Icon Buttons with Tooltips */}
+                            <QuickActions />
+                        </div>
+            
 
             {/* Search Section */}
             <Card className="p-6 mb-6">

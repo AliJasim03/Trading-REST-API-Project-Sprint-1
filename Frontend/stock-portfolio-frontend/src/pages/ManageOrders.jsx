@@ -5,6 +5,7 @@ import StatCard from '../components/ui/StatCard';
 import Button from '../components/ui/Button';
 import StatusBadge from '../components/ui/StatusBadge';
 import apiService from '../services/apiService';
+import QuickActions from '../components/ui/QuickActions';
 
 const ManageOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -120,9 +121,14 @@ const ManageOrders = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Manage Orders</h1>
-                <p className="text-gray-600 dark:text-gray-400">View and manage all orders in the system</p>
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Manage Orders</h1>
+                    <p className="text-gray-600 dark:text-gray-400">View and manage all orders in the system</p>
+                </div>
+                
+                {/* Quick Actions - Icon Buttons with Tooltips */}
+                <QuickActions />
             </div>
 
             {/* Summary Cards */}
