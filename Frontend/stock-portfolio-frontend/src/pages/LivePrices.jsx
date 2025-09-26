@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Loading from '../components/ui/Loading';
 import { livePrices } from '../services/apiService';
+import QuickActions from '../components/ui/QuickActions';
 
 const LivePrices = () => {
     const [popularStocks, setPopularStocks] = useState([]);
@@ -171,6 +172,7 @@ const LivePrices = () => {
                             />
                         </button>
                     </div>
+                    <QuickActions />
                 </div>
             </div>
 
