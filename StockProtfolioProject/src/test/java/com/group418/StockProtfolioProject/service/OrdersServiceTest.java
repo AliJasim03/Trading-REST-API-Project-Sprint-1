@@ -7,6 +7,7 @@ import com.group418.StockProtfolioProject.exception.ResourceNotFoundException;
 import com.group418.StockProtfolioProject.repository.OrdersRepository;
 import com.group418.StockProtfolioProject.repository.PortfolioRepository;
 import com.group418.StockProtfolioProject.repository.StocksRepository;
+import com.group418.StockProtfolioProject.repository.HoldingsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,13 +25,15 @@ class OrdersServiceTest {
     private PortfolioRepository portfolioRepository;
     private StocksRepository stocksRepository;
     private OrdersService ordersService;
+    private HoldingsRepository holdingsRepository;
 
     @BeforeEach
     void setUp() {
         ordersRepository = mock(OrdersRepository.class);
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
-        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository);
+        holdingsRepository = mock(HoldingsRepository.class);
+        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository);
     }
 
     @Test

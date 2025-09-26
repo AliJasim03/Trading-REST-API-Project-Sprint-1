@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/portfolios")
@@ -46,5 +47,35 @@ public class PortfolioController {
     public ResponseEntity<Void> deletePortfolio(@PathVariable Integer id) {
         portfolioService.deletePortfolio(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Dashboard Analytics Endpoints
+    
+    @GetMapping("/{id}/dashboard")
+    public ResponseEntity<Map<String, Object>> getPortfolioDashboard(@PathVariable Integer id) {
+        Map<String, Object> dashboard = portfolioService.getPortfolioDashboard(id);
+        return ResponseEntity.ok(dashboard);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<Map<String, Object>>> getPortfolioSummary() {
+        List<Map<String, Object>> summary = portfolioService.getPortfolioSummary();
+        return ResponseEntity.ok(summary);
+    }
+
+    @GetMapping("/{id}/performance")
+    public ResponseEntity<Map<String, Object>> getPortfolioPerformance(@PathVariable Integer id) {
+        List<com.group418.StockProtfolioProject.entity.Holdings> holdings = 
+            portfolioService.getPortfolioHoldings(id);
+        Map<String, Object> performance = portfolioService.calculatePerformance(id, holdings);
+        return ResponseEntity.ok(performance);
+    }
+
+    @GetMapping("/{id}/allocation")
+    public ResponseEntity<List<Map<String, Object>>> getPortfolioAllocation(@PathVariable Integer id) {
+        List<com.group418.StockProtfolioProject.entity.Holdings> holdings = 
+            portfolioService.getPortfolioHoldings(id);
+        List<Map<String, Object>> allocation = portfolioService.calculateAllocation(holdings);
+        return ResponseEntity.ok(allocation);
     }
 }

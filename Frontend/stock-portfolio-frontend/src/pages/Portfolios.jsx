@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, TrendingUp, DollarSign, PieChart, Target } from 'lucide-react';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Loading from '../components/ui/Loading';
-import StatusBadge from '../components/ui/StatusBadge';
+import PortfolioSelector from '../components/portfolio/PortfolioSelector';
+import PortfolioAnalytics from '../components/portfolio/PortfolioAnalytics';
+import TradingHistory from '../components/portfolio/TradingHistory';
+import HoldingsAllocation from '../components/portfolio/HoldingsAllocation';
 import apiService from '../services/apiService';
-
 const Portfolios = () => {
     const [portfolios, setPortfolios] = useState([]);
-    const [stocks, setStocks] = useState([]);
     const [selectedPortfolio, setSelectedPortfolio] = useState(null);
     const [tradingHistory, setTradingHistory] = useState([]);
     const [portfolioDashboard, setPortfolioDashboard] = useState(null);
@@ -16,100 +13,59 @@ const Portfolios = () => {
     const [historyLoading, setHistoryLoading] = useState(false);
     const [dashboardLoading, setDashboardLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [historyError, setHistoryError] = useState(null);
-    const [dashboardError, setDashboardError] = useState(null);
 
     useEffect(() => {
-        loadInitialData();
+        fetchPortfolios();
     }, []);
 
     useEffect(() => {
         if (selectedPortfolio) {
-            loadTradingHistory();
-            loadPortfolioDashboard();
+            fetchTradingHistory();
+            fetchPortfolioDashboard();
         }
     }, [selectedPortfolio]);
 
-    const loadInitialData = async () => {
-        setLoading(true);
-        setError(null);
+    const fetchPortfolios = async () => {
         try {
-            const [portfoliosData, stocksData] = await Promise.all([
-                apiService.getAllPortfolios(),
-                apiService.getAllStocks()
-            ]);
-
+            setLoading(true);
+            setError(null);
+            const portfoliosData = await apiService.getAllPortfolios();
             setPortfolios(portfoliosData);
-            setStocks(stocksData);
-
-            // Select first portfolio by default
-            if (portfoliosData.length > 0) {
-                setSelectedPortfolio(portfoliosData[0]);
-            }
-        } catch (err) {
-            console.error('Failed to load initial data:', err);
-            setError(err.message);
+        } catch (error) {
+            console.error('Error fetching portfolios:', error);
+            setError(error.message || 'Failed to load portfolios. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    const loadTradingHistory = async () => {
+    const fetchTradingHistory = async () => {
         if (!selectedPortfolio) return;
-
-        setHistoryLoading(true);
-        setHistoryError(null);
+        
         try {
-            const history = await apiService.getTradingHistory(selectedPortfolio.portfolioId);
-            setTradingHistory(history);
-        } catch (err) {
-            console.error('Failed to load trading history:', err);
-            setHistoryError(err.message);
+            setHistoryLoading(true);
+            const historyData = await apiService.getTradingHistory(selectedPortfolio.portfolioId);
+            setTradingHistory(historyData);
+        } catch (error) {
+            console.error('Error fetching trading history:', error);
         } finally {
             setHistoryLoading(false);
         }
     };
 
-    const loadPortfolioDashboard = async () => {
+    const fetchPortfolioDashboard = async () => {
         if (!selectedPortfolio) return;
-
-        setDashboardLoading(true);
-        setDashboardError(null);
+        
         try {
-            const dashboard = await apiService.getPortfolioDashboard(selectedPortfolio.portfolioId);
-            setPortfolioDashboard(dashboard);
-        } catch (err) {
-            console.error('Failed to load portfolio dashboard:', err);
-            setDashboardError(err.message);
+            setDashboardLoading(true);
+            const dashboardData = await apiService.getPortfolioDashboard(selectedPortfolio.portfolioId);
+            setPortfolioDashboard(dashboardData);
+        } catch (error) {
+            console.error('Error fetching portfolio dashboard:', error);
         } finally {
             setDashboardLoading(false);
         }
     };
-
-    const getStockInfo = (stockId) => {
-        const stock = stocks.find(s => s.stockId === stockId);
-        return stock ? `${stock.stockTicker} - ${stock.stockName}` : `Stock ID: ${stockId}`;
-    };
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2
-        }).format(value || 0);
-    };
-
-    const formatPercent = (value) => {
-        return `${(value || 0).toFixed(2)}%`;
-    };
-
-    if (loading) {
-        return (
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <Loading size="lg" text="Loading portfolios..." />
-            </div>
-        );
-    }
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -118,389 +74,38 @@ const Portfolios = () => {
                 <p className="text-gray-600 dark:text-gray-400">View and manage your investment portfolios with detailed analytics</p>
             </div>
 
-            {error && (
-                <Card className="p-4 mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
-                    <div className="flex items-center text-red-700 dark:text-red-300">
-                        <div className="text-sm">
-                            <strong>Error:</strong> {error}
-                        </div>
-                    </div>
-                </Card>
-            )}
+            <PortfolioSelector 
+                portfolios={portfolios}
+                selectedPortfolio={selectedPortfolio}
+                onPortfolioSelect={setSelectedPortfolio}
+                loading={loading}
+                error={error}
+                onRefresh={fetchPortfolios}
+            />
 
-            {/* Portfolio Selector */}
-            <Card className="p-6 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
-                {portfolios.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                        <p>No portfolios found. Please check your backend connection.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {portfolios.map(portfolio => (
-                            <div
-                                key={portfolio.portfolioId}
-                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                                    selectedPortfolio?.portfolioId === portfolio.portfolioId
-                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-md'
-                                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                                }`}
-                                onClick={() => setSelectedPortfolio(portfolio)}
-                            >
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{portfolio.portfolioName}</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{portfolio.description}</p>
-                                <div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">
-                                    <p>Capital: ${portfolio.initialCapital?.toLocaleString() || '0'}</p>
-                                    <p>Created: {new Date(portfolio.createdAt).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </Card>
-
-            {/* Portfolio Analytics Dashboard */}
             {selectedPortfolio && (
-                <Card className="p-6 mb-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Portfolio Analytics</h2>
-                        <Button onClick={loadPortfolioDashboard} loading={dashboardLoading} size="sm">
-                            <RefreshCw className="w-4 h-4" />
-                            Refresh
-                        </Button>
+                <>
+                    <PortfolioAnalytics 
+                        performance={portfolioDashboard?.performance}
+                        loading={dashboardLoading}
+                    />
+
+                    <div className="mt-5">
+                        <TradingHistory 
+                            tradingHistory={tradingHistory}
+                            loading={historyLoading}
+                        />
+
+                        
+                    </div>
+                    <div className="mt-5">
+                        <HoldingsAllocation 
+                            holdingsAllocation={portfolioDashboard?.allocation}
+                            loading={dashboardLoading}
+                        />
                     </div>
 
-                    {dashboardError && (
-                        <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-                            Error loading portfolio analytics: {dashboardError}
-                        </div>
-                    )}
-
-                    {dashboardLoading ? (
-                        <Loading text="Loading analytics..." />
-                    ) : portfolioDashboard ? (
-                        <>
-                            {/* Performance Metrics */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                                    <div className="flex items-center">
-                                        <DollarSign className="text-blue-600 dark:text-blue-400 w-8 h-8 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
-                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                                                {formatCurrency(portfolioDashboard.totalValue)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                                    <div className="flex items-center">
-                                        <Target className="text-green-600 dark:text-green-400 w-8 h-8 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">Available Capital</p>
-                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                                                {formatCurrency(portfolioDashboard.availableCapital)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-                                    <div className="flex items-center">
-                                        <PieChart className="text-purple-600 dark:text-purple-400 w-8 h-8 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">Total Capital</p>
-                                            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                                                {formatCurrency(portfolioDashboard.totalCapital)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className={`p-4 rounded-lg ${
-                                    (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
-                                        ? 'bg-green-50 dark:bg-green-900/20' 
-                                        : 'bg-red-50 dark:bg-red-900/20'
-                                }`}>
-                                    <div className="flex items-center">
-                                        <TrendingUp className={`w-8 h-8 mr-3 ${
-                                            (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
-                                                ? 'text-green-600 dark:text-green-400' 
-                                                : 'text-red-600 dark:text-red-400'
-                                        }`} />
-                                        <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">Gain/Loss</p>
-                                            <p className={`text-xl font-bold ${
-                                                (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
-                                                    ? 'text-green-600 dark:text-green-400' 
-                                                    : 'text-red-600 dark:text-red-400'
-                                            }`}>
-                                                {formatCurrency(portfolioDashboard.performance?.totalGainLoss)}
-                                            </p>
-                                            <p className={`text-xs ${
-                                                (portfolioDashboard.performance?.totalGainLoss || 0) >= 0 
-                                                    ? 'text-green-600 dark:text-green-400' 
-                                                    : 'text-red-600 dark:text-red-400'
-                                            }`}>
-                                                {formatPercent(portfolioDashboard.performance?.gainLossPercent)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Holdings Allocation */}
-                            {portfolioDashboard.allocation && portfolioDashboard.allocation.length > 0 && (
-                                <div className="mb-8">
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Holdings Allocation</h3>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                                <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                        Stock
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                        Quantity
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                        Current Price
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                        Value
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                        Allocation %
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-                                                {portfolioDashboard.allocation.map((holding, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                {holding.stockSymbol}
-                                                            </div>
-                                                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                                {holding.stockName}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                            {holding.quantity}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                            {formatCurrency(holding.currentPrice)}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                            {formatCurrency(holding.value)}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                            <div className="flex items-center">
-                                                                <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
-                                                                    <div 
-                                                                        className="bg-primary-600 h-2 rounded-full" 
-                                                                        style={{ width: `${Math.min(holding.percentage, 100)}%` }}
-                                                                    ></div>
-                                                                </div>
-                                                                <span>{formatPercent(holding.percentage)}</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <p>No analytics data available for this portfolio.</p>
-                        </div>
-                    )}
-                </Card>
-            )}
-
-            {/* Portfolio Details */}
-            {selectedPortfolio && (
-                <Card className="p-6 mb-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Portfolio Details</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Name:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">{selectedPortfolio.portfolioName}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Description:</span>
-                                    <span className="font-medium text-right text-gray-900 dark:text-gray-100">{selectedPortfolio.description}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Initial Capital:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">${selectedPortfolio.initialCapital?.toLocaleString() || '0'}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Created:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">{new Date(selectedPortfolio.createdAt).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Trading Activity</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Total Orders:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">{tradingHistory.length}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Pending:</span>
-                                    <span className="font-medium text-yellow-600 dark:text-yellow-400">
-                    {tradingHistory.filter(order => order.status_code === 0).length}
-                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Filled:</span>
-                                    <span className="font-medium text-green-600 dark:text-green-400">
-                    {tradingHistory.filter(order => order.status_code === 1).length}
-                  </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Quick Stats</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Order Volume:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {tradingHistory.reduce((sum, order) => sum + (order.volume || 0), 0)} shares
-                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Total Fees:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                    ${tradingHistory.reduce((sum, order) => sum + (order.fees || 0), 0).toFixed(2)}
-                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">Holdings Count:</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {portfolioDashboard?.totalHoldings || 0}
-                  </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            )}
-
-            {/* Trading History */}
-            {selectedPortfolio && (
-                <Card className="p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Trading History</h2>
-                        <Button onClick={loadTradingHistory} loading={historyLoading} size="sm">
-                            <RefreshCw className="w-4 h-4" />
-                            Refresh
-                        </Button>
-                    </div>
-
-                    {historyError && (
-                        <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-                            Error loading trading history: {historyError}
-                        </div>
-                    )}
-
-                    {historyLoading ? (
-                        <Loading text="Loading trading history..." />
-                    ) : tradingHistory.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <RefreshCw className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <p className="text-lg font-medium mb-2">No trading history found</p>
-                            <p className="text-sm">This portfolio doesn't have any orders yet.</p>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full table-auto">
-                                <thead>
-                                <tr className="bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-600">
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Order ID
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Stock
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Type
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Price
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Volume
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Total
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Fees
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Date
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-                                {tradingHistory.map((order) => (
-                                    <tr key={order.orderId} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            #{order.orderId}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {getStockInfo(order.stock?.stockId)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            order.buy_or_sell === 'BUY'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                        }`}>
-                          {order.buy_or_sell}
-                        </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            ${order.price?.toFixed(2) || '0.00'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {order.volume || 0}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            ${((order.price || 0) * (order.volume || 0)).toFixed(2)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            ${order.fees?.toFixed(2) || '0.00'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <StatusBadge status={order.status_code} />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </Card>
+                </>
             )}
         </div>
     );
