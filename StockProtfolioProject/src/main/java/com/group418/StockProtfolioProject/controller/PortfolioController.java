@@ -2,9 +2,11 @@ package com.group418.StockProtfolioProject.controller;
 
 import com.group418.StockProtfolioProject.entity.Portfolios;
 import com.group418.StockProtfolioProject.service.PortfolioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +34,43 @@ public class PortfolioController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Portfolios> createPortfolio(@RequestBody Portfolios portfolio) {
-        Portfolios createdPortfolio = portfolioService.createPortfolio(portfolio);
-        return ResponseEntity.ok(createdPortfolio);
+    public ResponseEntity<?> createPortfolio(@RequestBody Portfolios portfolio) {
+        try {
+            Portfolios createdPortfolio = portfolioService.createPortfolio(portfolio);
+            return ResponseEntity.ok(createdPortfolio);
+        } catch (IllegalArgumentException e) {
+            // Return validation errors as 400 Bad Request with detailed message
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Validation Error");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            // Return other errors as 500 Internal Server Error
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Server Error");
+            errorResponse.put("message", "An unexpected error occurred while creating the portfolio");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Portfolios> updatePortfolio(@PathVariable Integer id, @RequestBody Portfolios portfolio) {
-        Portfolios updatedPortfolio = portfolioService.updatePortfolio(id, portfolio);
-        return ResponseEntity.ok(updatedPortfolio);
+    public ResponseEntity<?> updatePortfolio(@PathVariable Integer id, @RequestBody Portfolios portfolio) {
+        try {
+            Portfolios updatedPortfolio = portfolioService.updatePortfolio(id, portfolio);
+            return ResponseEntity.ok(updatedPortfolio);
+        } catch (IllegalArgumentException e) {
+            // Return validation errors as 400 Bad Request with detailed message
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Validation Error");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            // Return other errors as 500 Internal Server Error
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Server Error");
+            errorResponse.put("message", "An unexpected error occurred while updating the portfolio");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @DeleteMapping("/{id}")
