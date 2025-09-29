@@ -45,13 +45,13 @@ export default function QuickActions() {
                     </Link>
                 </Tooltip> */}
                 
-                <Tooltip content="Check Order Status" position="bottom">
+                {/* <Tooltip content="Check Order Status" position="bottom">
                     <Link to="/order-status">
                         <button className={getButtonClasses('/order-status', 'green')}>
                             <Search className="w-5 h-5" />
                         </button>
                     </Link>
-                </Tooltip>
+                </Tooltip> */}
                 
                 <Tooltip content="Manage Orders" position="bottom">
                     <Link to="/manage-orders">

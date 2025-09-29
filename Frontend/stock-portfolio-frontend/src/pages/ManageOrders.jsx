@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Settings, Check, X, Clock, CheckCircle, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
 import Button from '../components/ui/Button';
@@ -8,6 +9,7 @@ import apiService from '../services/apiService';
 import QuickActions from '../components/ui/QuickActions';
 
 const ManageOrders = () => {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -260,7 +262,13 @@ const ManageOrders = () => {
                                             <div className="flex items-center">
                                                 {getStatusIcon(order.status_code)}
                                                 <div className="ml-3">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">#{order.orderId}</div>
+                                                    <button
+                                                        onClick={() => navigate(`/order-status?id=${order.orderId}`)}
+                                                        className="text-sm font-medium text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 hover:underline transition-colors"
+                                                        title="View order details"
+                                                    >
+                                                        #{order.orderId}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </td>
