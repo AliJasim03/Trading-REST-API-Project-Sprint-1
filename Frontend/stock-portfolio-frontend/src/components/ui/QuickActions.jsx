@@ -1,11 +1,29 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Plus, Search, Settings } from 'lucide-react';
 import Tooltip from './Tooltip';
 import PlaceOrderDialog from '../dialog/PlaceOrderDialog';
 
 export default function QuickActions() {
     const [isPlaceOrderDialogOpen, setIsPlaceOrderDialogOpen] = useState(false);
+    const location = useLocation();
+
+    // Helper function to determine if a button should be active/highlighted
+    const isActive = (path) => location.pathname === path;
+
+    // Helper function to get button classes with active state
+    const getButtonClasses = (path, baseColor) => {
+        const active = isActive(path);
+        const baseClasses = "p-3 rounded-lg transition-all hover:scale-105 active:scale-95";
+        
+        if (active) {
+            // Active state with more prominent styling
+            return `${baseClasses} bg-${baseColor}-200 dark:bg-${baseColor}-800/70 text-${baseColor}-700 dark:text-${baseColor}-300 ring-2 ring-${baseColor}-300 dark:ring-${baseColor}-600`;
+        } else {
+            // Normal state
+            return `${baseClasses} bg-${baseColor}-100 hover:bg-${baseColor}-200 dark:bg-${baseColor}-900/30 dark:hover:bg-${baseColor}-800/50 text-${baseColor}-600 dark:text-${baseColor}-400`;
+        }
+    };
 
     return (
         <>
@@ -27,17 +45,17 @@ export default function QuickActions() {
                     </Link>
                 </Tooltip> */}
                 
-                <Tooltip content="Check Order Status" position="bottom">
+                {/* <Tooltip content="Check Order Status" position="bottom">
                     <Link to="/order-status">
-                        <button className="p-3 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 text-green-600 dark:text-green-400 transition-all hover:scale-105 active:scale-95">
+                        <button className={getButtonClasses('/order-status', 'green')}>
                             <Search className="w-5 h-5" />
                         </button>
                     </Link>
-                </Tooltip>
+                </Tooltip> */}
                 
                 <Tooltip content="Manage Orders" position="bottom">
                     <Link to="/manage-orders">
-                        <button className="p-3 rounded-lg bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-800/50 text-yellow-600 dark:text-yellow-400 transition-all hover:scale-105 active:scale-95">
+                        <button className={getButtonClasses('/manage-orders', 'yellow')}>
                             <Settings className="w-5 h-5" />
                         </button>
                     </Link>

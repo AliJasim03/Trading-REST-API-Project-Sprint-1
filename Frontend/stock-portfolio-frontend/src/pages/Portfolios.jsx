@@ -40,6 +40,16 @@ const Portfolios = () => {
         }
     };
 
+    const handlePortfolioCreated = (newPortfolio) => {
+        // Add the new portfolio to the list
+        setPortfolios(prev => [...prev, newPortfolio]);
+        
+        // If this is the first portfolio, select it
+        if (portfolios.length === 0) {
+            setSelectedPortfolio(newPortfolio);
+        }
+    };
+
     const fetchTradingHistory = async () => {
         if (!selectedPortfolio) return;
         
@@ -88,6 +98,7 @@ const Portfolios = () => {
                 loading={loading}
                 error={error}
                 onRefresh={fetchPortfolios}
+                onPortfolioCreated={handlePortfolioCreated}
             />
 
             {selectedPortfolio && (

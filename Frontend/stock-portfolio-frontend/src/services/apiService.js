@@ -118,6 +118,24 @@ const apiService = {
         }
     },
 
+    createPortfolio: async (portfolioData) => {
+        try {
+            const response = await apiClient.post('/portfolios/create', portfolioData);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    updatePortfolio: async (portfolioId, portfolioData) => {
+        try {
+            const response = await apiClient.put(`/portfolios/${portfolioId}`, portfolioData);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // Portfolio Analytics APIs
     getPortfolioSummary: async () => {
         try {

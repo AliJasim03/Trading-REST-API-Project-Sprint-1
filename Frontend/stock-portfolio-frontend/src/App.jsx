@@ -4,7 +4,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navigation from './components/ui/Navigation';
 import Dashboard from './pages/Dashboard';
 import Portfolios from './pages/Portfolios';
-import PlaceOrder from './pages/PlaceOrder';
 import OrderStatus from './pages/OrderStatus';
 import ManageOrders from './pages/ManageOrders';
 import LivePrices from './pages/LivePrices';
@@ -20,7 +19,6 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Dashboard />} />
                             <Route path="/portfolios" element={<Portfolios />} />
-                            <Route path="/place-order" element={<PlaceOrder />} />
                             <Route path="/order-status" element={<OrderStatus />} />
                             <Route path="/manage-orders" element={<ManageOrders />} />
                             <Route path="/live-prices" element={<LivePrices />} />
