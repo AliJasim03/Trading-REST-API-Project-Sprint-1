@@ -251,6 +251,73 @@ const livePriceService = {
     }
 };
 
+const watchlistService = {
+    // Add stock to watchlist with alert
+    addToWatchlist: async (stockId, targetPrice, alertDirection) => {
+        try {
+            const response = await apiClient.post('/api/watchlist', null, {
+                params: {
+                    id: 1, // Placeholder user ID since you don't have user auth yet
+                    stockId,
+                    targetPrice,
+                    direction: alertDirection
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Add stock to watchlist without alert
+    addStockToWatchlist: async (stockId) => {
+        try {
+            const response = await apiClient.post('/api/watchlist/stock', null, {
+                params: {
+                    id: 1, // Placeholder user ID since you don't have user auth yet
+                    stockId
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Remove stock from watchlist
+    removeFromWatchlist: async (entryId) => {
+        try {
+            const response = await apiClient.delete(`/api/watchlist/${entryId}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Get all watchlist entries
+    getAllWatchlist: async () => {
+        try {
+            const response = await apiClient.get('/api/watchlist/all');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Update watchlist entry
+    updateWatchlistEntry: async (entryId, targetPrice, alertDirection) => {
+        try {
+            const response = await apiClient.put(`/api/watchlist/${entryId}`, {
+                targetPrice,
+                alertDirection
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+};
+
 // Export both services
 export default apiService;
-export { livePriceService as livePrices };
+export { livePriceService as livePrices, watchlistService };

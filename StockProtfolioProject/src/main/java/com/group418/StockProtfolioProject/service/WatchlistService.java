@@ -27,7 +27,25 @@ public class WatchlistService {
         WatchlistEntry entry = new WatchlistEntry();
         entry.setStock(stock);
         entry.setTargetPrice(targetPrice);
-        entry.setAlertDirection(direction);
+        entry.setAlertDirection(direction); 
+        return watchlistRepository.save(entry);
+    }
+
+    // New method to add stock to watchlist without alert
+    public WatchlistEntry addStockToWatchlist(Long userId, Long stockId) {
+        Integer stockIdInt = stockId.intValue();
+        Stocks stock = stocksRepository.findById(stockIdInt)
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found"));
+        
+        List<WatchlistEntry> existing = watchlistRepository.findByStock(stock);
+        if (!existing.isEmpty()) {
+            throw new IllegalArgumentException("Stock is already in your watchlist");
+        }
+        
+        WatchlistEntry entry = new WatchlistEntry();
+        entry.setStock(stock);
+        entry.setTargetPrice(null); // No alert initially
+        entry.setAlertDirection(null); // No alert initially
         return watchlistRepository.save(entry);
     }
 

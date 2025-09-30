@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/watchlist")
+@CrossOrigin(origins = "http://localhost:3000")
 public class WatchlistController {
 
     @Autowired
@@ -23,10 +24,22 @@ public class WatchlistController {
         return ResponseEntity.ok(watchlistService.addToWatchlist(id, stockId, targetPrice, direction));
     }
 
+    @PostMapping("/stock")
+    public ResponseEntity<WatchlistEntry> addStockToWatchlist(@RequestParam Long id,
+                                                             @RequestParam Long stockId) {
+        return ResponseEntity.ok(watchlistService.addStockToWatchlist(id, stockId));
+    }
+
     @DeleteMapping("/{entryId}")
     public ResponseEntity<Void> removeFromWatchlist(@PathVariable Long entryId) {
         watchlistService.removeFromWatchlist(entryId);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/all")
+    public ResponseEntity<?>  getAllWatchlist(){
+        return ResponseEntity.ok(watchlistService.getAll());
+    }
+        
 }
 
