@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { AgGridReact } from 'ag-grid-react';
 import Navigation from './components/ui/Navigation';
 import Dashboard from './pages/Dashboard';
 import Portfolios from './pages/Portfolios';

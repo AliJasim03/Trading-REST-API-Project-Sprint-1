@@ -12,5 +12,9 @@
   "type": "commonjs",
   "devDependencies": {
     "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "ag-grid": "^18.1.2",
+    "ag-grid-react": "^34.2.0"
   }
 }
