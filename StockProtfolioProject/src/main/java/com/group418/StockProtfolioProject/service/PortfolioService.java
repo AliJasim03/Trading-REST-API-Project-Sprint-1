@@ -50,9 +50,61 @@ public class PortfolioService {
     public Portfolios updatePortfolio(Integer id, Portfolios portfolioDetails) {
         Portfolios portfolio = getPortfolioById(id);
 
-        portfolio.setPortfolioName(portfolioDetails.getPortfolioName());
-        portfolio.setDescription(portfolioDetails.getDescription());
-        portfolio.setInitialCapital(portfolioDetails.getInitialCapital());
+        if (portfolioDetails.getPortfolioName() == null || portfolioDetails.getPortfolioName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Portfolio name cannot be null or empty");
+        }
+        
+        if (portfolioDetails.getPortfolioName().trim().length() < 2) {
+            throw new IllegalArgumentException("Portfolio name must be at least 2 characters long");
+        }
+        
+        if (portfolioDetails.getPortfolioName().trim().length() > 100) {
+            throw new IllegalArgumentException("Portfolio name cannot exceed 100 characters");
+        }
+
+        if (portfolioDetails.getDescription() == null || portfolioDetails.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("Portfolio description cannot be null or empty");
+        }
+        
+        if (portfolioDetails.getDescription().trim().length() < 10) {
+            throw new IllegalArgumentException("Portfolio description must be at least 10 characters long");
+        }
+        
+        if (portfolioDetails.getDescription().trim().length() > 500) {
+            throw new IllegalArgumentException("Portfolio description cannot exceed 500 characters");
+        }
+
+        // Check if portfolio has any orders/holdings
+        List<Orders> existingOrders = ordersRepository.findByPortfoliosPortfolioId(id);
+        List<Holdings> existingHoldings = holdingsRepository.findByPortfolioPortfolioId(id);
+        
+        boolean hasActivity = !existingOrders.isEmpty() || !existingHoldings.isEmpty();
+        
+        if (hasActivity && portfolioDetails.getInitialCapital() != portfolio.getInitialCapital()) {
+            throw new IllegalArgumentException(
+                "Cannot modify capital for portfolios with existing orders or holdings. " +
+                "Current available capital: $" + String.format("%.2f", portfolio.getInitialCapital())
+            );
+        }
+        
+        // If no activity, validate the new initial capital
+        if (!hasActivity) {
+            if (portfolioDetails.getInitialCapital() <= 0) {
+                throw new IllegalArgumentException("Initial capital must be greater than 0");
+            }
+            
+            if (portfolioDetails.getInitialCapital() > 1000000) {
+                throw new IllegalArgumentException("Initial capital cannot exceed $1,000,000");
+            }
+        }
+
+        portfolio.setPortfolioName(portfolioDetails.getPortfolioName().trim());
+        portfolio.setDescription(portfolioDetails.getDescription().trim());
+        
+        // Only update initial capital if portfolio has no activity
+        if (!hasActivity) {
+            portfolio.setInitialCapital(portfolioDetails.getInitialCapital());
+        }
 
         return portfolioRepository.save(portfolio);
     }

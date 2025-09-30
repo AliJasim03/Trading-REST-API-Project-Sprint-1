@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Briefcase, Plus } from 'lucide-react';
+import { Briefcase, Pencil, Plus } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import CreatePortfolioDialog from '../dialog/CreatePortfolioDialog';
+import UpdatePortfolioDialog from '../dialog/UpdatePortfolioDialog';
 
 const PortfolioSelector = ({ 
     portfolios, 
@@ -14,7 +15,17 @@ const PortfolioSelector = ({
     onPortfolioCreated 
 }) => {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
+    const handlePortfolioUpdated = (updatedPortfolio) => {
+        // Close the dialog
+        setIsUpdateDialogOpen(false);
+        
+        // Refresh the portfolio list to show updated data
+        if (onRefresh) {
+            onRefresh();
+        }
+    };
     const handlePortfolioCreated = (newPortfolio) => {
         // Close the dialog
         setIsCreateDialogOpen(false);
@@ -64,13 +75,28 @@ const PortfolioSelector = ({
         <Card className="p-6 mb-8">
           <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
-              <button 
-                  onClick={() => setIsCreateDialogOpen(true)} 
-                  className="p-3 rounded-lg bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400 transition-all hover:scale-105 active:scale-95"
-                  title="Create New Portfolio"
-              >
-                  <Plus className="w-5 h-5" />
-              </button>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => setIsUpdateDialogOpen(true)} 
+                  className={`p-3 rounded-lg transition-all hover:scale-105 active:scale-95 ${
+                    selectedPortfolio 
+                      ? 'bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400' 
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                  }`}
+                  title={selectedPortfolio ? "Edit Selected Portfolio" : "Select a portfolio to edit"}
+                  disabled={!selectedPortfolio}
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+                <button 
+                    onClick={() => setIsCreateDialogOpen(true)} 
+                    className="p-3 rounded-lg bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400 transition-all hover:scale-105 active:scale-95"
+                    title="Create New Portfolio"
+                    >
+                    <Plus className="w-5 h-5" />
+                </button>
+              </div>
+              
           </div>
           
             
@@ -118,6 +144,13 @@ const PortfolioSelector = ({
                 isOpen={isCreateDialogOpen}
                 onClose={() => setIsCreateDialogOpen(false)}
                 onPortfolioCreated={handlePortfolioCreated}
+            />
+            {/* Update Portfolio Dialog */}
+            <UpdatePortfolioDialog
+                isOpen={isUpdateDialogOpen}
+                onClose={() => setIsUpdateDialogOpen(false)}
+                portfolio={selectedPortfolio}
+                onPortfolioUpdated={handlePortfolioUpdated}
             />
         </Card>
     );
