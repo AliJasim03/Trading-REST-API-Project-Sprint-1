@@ -8,7 +8,7 @@ const Dialog = ({
     children, 
     size = 'md',
     showCloseButton = true,
-    closeOnOverlayClick = true 
+    closeOnOverlayClick = true
 }) => {
     const sizeClasses = {
         sm: 'max-w-md',
@@ -47,6 +47,7 @@ const Dialog = ({
 
     return (
         <div 
+            data-testid="dialog-overlay"
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
             onClick={handleOverlayClick}
         >
