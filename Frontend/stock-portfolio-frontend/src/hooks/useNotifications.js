@@ -6,29 +6,15 @@ const useNotifications = () => {
 
     // Initialize with mock data - replace with API call
     useEffect(() => {
-        // Mock initial notifications
+        // Mock initial notifications (these will be replaced by real notifications from your backend)
         const mockNotifications = [
             {
                 id: 1,
-                type: 'alert',
-                title: 'Price Alert Triggered',
-                message: 'AAPL hit your target price of $150.00',
-                currentPrice: '$152.30',
-                timestamp: new Date(Date.now() - 5 * 60 * 1000),
-                read: false,
-                stock: 'AAPL',
-                direction: 'above'
-            },
-            {
-                id: 2,
-                type: 'alert',
-                title: 'Price Alert Triggered',
-                message: 'MSFT dropped below your target of $300.00',
-                currentPrice: '$298.75',
-                timestamp: new Date(Date.now() - 15 * 60 * 1000),
-                read: false,
-                stock: 'MSFT',
-                direction: 'below'
+                type: 'system',
+                title: 'Welcome to Portfolio Manager',
+                message: 'Your notification system is now active!',
+                timestamp: new Date(Date.now() - 60 * 60 * 1000),
+                read: false
             }
         ];
 
@@ -118,6 +104,53 @@ const useNotifications = () => {
         });
     }, [addNotification]);
 
+    // Function to add order placed notifications
+    const addOrderPlaced = useCallback((stock, orderType, buySell, volume, price) => {
+        addNotification({
+            type: 'order',
+            title: 'Order Placed',
+            message: `${buySell.toUpperCase()} ${volume} shares of ${stock} at $${price}`,
+            stock,
+            orderType,
+            buySell,
+            volume,
+            price,
+            status: 'placed'
+        });
+    }, [addNotification]);
+
+    // Function to add order filled notifications
+    const addOrderFilled = useCallback((stock, orderType, buySell, volume, price, totalValue) => {
+        addNotification({
+            type: 'order',
+            title: 'Order Filled ✅',
+            message: `${buySell.toUpperCase()} order for ${volume} shares of ${stock} filled at $${price}`,
+            currentPrice: `Total: $${totalValue}`,
+            stock,
+            orderType,
+            buySell,
+            volume,
+            price,
+            status: 'filled'
+        });
+    }, [addNotification]);
+
+    // Function to add order rejected notifications
+    const addOrderRejected = useCallback((stock, orderType, buySell, volume, price, reason) => {
+        addNotification({
+            type: 'order',
+            title: 'Order Rejected ❌',
+            message: `${buySell.toUpperCase()} order for ${volume} shares of ${stock} was rejected`,
+            currentPrice: reason ? `Reason: ${reason}` : '',
+            stock,
+            orderType,
+            buySell,
+            volume,
+            price,
+            status: 'rejected'
+        });
+    }, [addNotification]);
+
     return {
         notifications,
         unreadCount,
@@ -127,7 +160,10 @@ const useNotifications = () => {
         clearAllNotifications,
         addPriceAlert,
         addPortfolioUpdate,
-        addSystemNotification
+        addSystemNotification,
+        addOrderPlaced,
+        addOrderFilled,
+        addOrderRejected
     };
 };
 

@@ -3,6 +3,8 @@ import { Search, Check, X, Clock, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
+import { useNotificationContext } from '../../context/NotificationContext';
+import { toast } from 'react-toastify';
 
 const ManageOrdersGrid = ({ 
     orders, 
@@ -11,6 +13,47 @@ const ManageOrdersGrid = ({
     onUpdateStatus 
 }) => {
     const navigate = useNavigate();
+    
+    // Access notification functions
+    const { addOrderFilled, addOrderRejected } = useNotificationContext();
+
+    // Enhanced status update handler with notifications
+    const handleStatusUpdate = async (orderId, newStatus) => {
+        const order = orders.find(o => o.orderId === orderId);
+        if (!order) return;
+
+        try {
+            await onUpdateStatus(orderId, newStatus);
+            
+            const stockTicker = order.stock?.stockTicker || 'Unknown';
+            const totalValue = (order.price * order.volume + order.fees).toFixed(2);
+
+            if (newStatus === 1) { // Filled
+                addOrderFilled(
+                    stockTicker,
+                    order.order_type,
+                    order.buy_or_sell,
+                    order.volume,
+                    order.price.toFixed(2),
+                    totalValue
+                );
+                toast.success(`${order.buy_or_sell} order for ${stockTicker} has been filled!`);
+            } else if (newStatus === 2) { // Rejected
+                addOrderRejected(
+                    stockTicker,
+                    order.order_type,
+                    order.buy_or_sell,
+                    order.volume,
+                    order.price.toFixed(2),
+                    'Manual rejection'
+                );
+                toast.error(`${order.buy_or_sell} order for ${stockTicker} has been rejected.`);
+            }
+        } catch (error) {
+            console.error('Failed to update order status:', error);
+            toast.error('Failed to update order status');
+        }
+    };
 
     const getStatusIcon = (statusCode) => {
         switch (statusCode) {
@@ -111,7 +154,7 @@ const ManageOrdersGrid = ({
                                         {order.status_code === 0 ? (
                                             <div className="flex space-x-2">
                                                 <button
-                                                    onClick={() => onUpdateStatus(order.orderId, 1)}
+                                                    onClick={() => handleStatusUpdate(order.orderId, 1)}
                                                     disabled={updating[order.orderId]}
                                                     className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 disabled:opacity-50"
                                                     title="Mark as Filled"
@@ -119,7 +162,7 @@ const ManageOrdersGrid = ({
                                                     <Check className="w-4 h-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => onUpdateStatus(order.orderId, 2)}
+                                                    onClick={() => handleStatusUpdate(order.orderId, 2)}
                                                     disabled={updating[order.orderId]}
                                                     className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
                                                     title="Mark as Rejected"

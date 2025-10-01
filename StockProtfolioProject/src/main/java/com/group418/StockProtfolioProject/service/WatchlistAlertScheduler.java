@@ -12,11 +12,14 @@ public class WatchlistAlertScheduler {
 
     private final WatchlistRepository watchlistRepository;
     private final LivePriceService livePriceService;
+    private final NotificationService notificationService;
 
     public WatchlistAlertScheduler(WatchlistRepository watchlistRepository,
-                                   LivePriceService livePriceService) {
+                                   LivePriceService livePriceService,
+                                   NotificationService notificationService) {
         this.watchlistRepository = watchlistRepository;
         this.livePriceService = livePriceService;
+        this.notificationService = notificationService;
     }
 
     @Scheduled(fixedRate = 60000) // every 1 min
@@ -33,11 +36,8 @@ public class WatchlistAlertScheduler {
                 boolean shouldAlert = checkShouldAlert(entry, currentPrice);
 
                 if (shouldAlert) {
-                    // send notification (log for now)
-                    System.out.printf("ALERT: %s hit target %s at price %s%n",
-                            entry.getStock().getStockTicker(),
-                            entry.getTargetPrice(),
-                            currentPrice);
+                    // Send notification
+                    notificationService.notifyPriceAlert(entry, currentPrice);
 
                     // Update alert status
                     entry.setNotified(true);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Check, X, TrendingUp, TrendingDown, Clock, AlertTriangle } from 'lucide-react';
+import { Bell, Check, X, TrendingUp, TrendingDown, Clock, AlertTriangle, ShoppingCart, CheckCircle, XCircle } from 'lucide-react';
 import { useNotificationContext } from '../../context/NotificationContext';
 
 const NotificationDropdown = () => {
@@ -48,6 +48,18 @@ const NotificationDropdown = () => {
             return notification.direction === 'above' ? 
                 <TrendingUp className="w-4 h-4 text-green-600" /> : 
                 <TrendingDown className="w-4 h-4 text-red-600" />;
+        }
+        if (notification.type === 'order') {
+            switch (notification.status) {
+                case 'placed':
+                    return <ShoppingCart className="w-4 h-4 text-blue-600" />;
+                case 'filled':
+                    return <CheckCircle className="w-4 h-4 text-green-600" />;
+                case 'rejected':
+                    return <XCircle className="w-4 h-4 text-red-600" />;
+                default:
+                    return <ShoppingCart className="w-4 h-4 text-gray-600" />;
+            }
         }
         if (notification.icon === 'portfolio') {
             return <TrendingUp className="w-4 h-4 text-blue-600" />;

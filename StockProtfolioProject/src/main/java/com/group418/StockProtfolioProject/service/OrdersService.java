@@ -20,12 +20,16 @@ public class OrdersService {
     private final StocksRepository stocksRepository;
     private final PortfolioRepository portfolioRepository;
     private final HoldingsRepository holdingsRepository;
+    private final NotificationService notificationService;
 
-    public OrdersService(OrdersRepository ordersRepository, StocksRepository stocksRepository, PortfolioRepository portfolioRepository, HoldingsRepository holdingsRepository) {
+    public OrdersService(OrdersRepository ordersRepository, StocksRepository stocksRepository, 
+                        PortfolioRepository portfolioRepository, HoldingsRepository holdingsRepository,
+                        NotificationService notificationService) {
         this.ordersRepository = ordersRepository;
         this.stocksRepository = stocksRepository;
         this.portfolioRepository = portfolioRepository;
         this.holdingsRepository = holdingsRepository;
+        this.notificationService = notificationService;
     }
 
     public Orders placeOrder(int portfolio_id, int stock_id, Orders orders_request){
@@ -39,7 +43,12 @@ public class OrdersService {
         orders_request.setStatus_code(0); // Pending
         orders_request.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
-        return ordersRepository.save(orders_request);
+        Orders savedOrder = ordersRepository.save(orders_request);
+        
+        // Send notification when order is placed
+        notificationService.notifyOrderPlaced(savedOrder);
+        
+        return savedOrder;
     }
 
     public List<Orders> getTradingHistory(int portfolio_id) {
@@ -71,11 +80,19 @@ public class OrdersService {
         if (oldStatusCode != 1 && newStatusCode == 1) {
             updatePortfolioCapital(order);
             updateHoldings(order);
+            // Send notification when order is filled
+            notificationService.notifyOrderFilled(order);
         }
         // Reverse capital changes when order status changes from FILLED back to PENDING/REJECTED
         else if (oldStatusCode == 1 && newStatusCode != 1) {
             reversePortfolioCapital(order);
             reverseHoldings(order);
+        }
+        
+        // Send notification when order is rejected
+        if (newStatusCode == 2) {
+            String rejectionReason = oldStatusCode == 0 ? "Order rejected by system" : "Order status changed to rejected";
+            notificationService.notifyOrderRejected(order, rejectionReason);
         }
 
         return ordersRepository.save(order);

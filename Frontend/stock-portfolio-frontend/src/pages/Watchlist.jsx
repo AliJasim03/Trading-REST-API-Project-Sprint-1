@@ -21,8 +21,8 @@ const Watchlist = () => {
     const [selectedStock, setSelectedStock] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     
-    // Access notification functions
-    const { addPriceAlert, addSystemNotification } = useNotificationContext();
+    // Access notification functions (for potential future use with watchlist alerts)
+    const { addPriceAlert } = useNotificationContext();
 
     // Load watchlist data
     const loadWatchlist = async () => {
@@ -42,16 +42,6 @@ const Watchlist = () => {
             setLoading(false);
         }
     };
-    const getUniqueWatchlistStocks = () => {
-        const stockMap = new Map();
-        
-        watchlistData.forEach(entry => {
-            if (entry.stock) {
-                stockMap.set(entry.stock.stockId, entry.stock);
-            }
-        });
-        return Array.from(stockMap.values());
-    }
 
     // Refresh watchlist
     const handleRefresh = async () => {
@@ -167,19 +157,6 @@ const Watchlist = () => {
                         >
                             <RotateCcw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                             Refresh
-                        </Button>
-                        
-                        {/* Demo Notification Button */}
-                        <Button
-                            onClick={() => {
-                                addPriceAlert('AAPL', '150.00', '152.30', 'above');
-                                toast.success('Demo notification added!');
-                            }}
-                            variant="outline"
-                            className="flex items-center text-blue-600 dark:text-blue-400"
-                        >
-                            <Bell className="w-4 h-4 mr-2" />
-                            Demo Alert
                         </Button>
                     </div>
                 </div>
