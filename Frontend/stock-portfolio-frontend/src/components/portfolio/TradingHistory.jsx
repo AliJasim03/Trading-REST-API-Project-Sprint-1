@@ -105,11 +105,13 @@ const agGridTheme = useAgGridTheme();
                 </div>
                 <div className="animate-pulse space-y-3">
                     {[...Array(5)].map((_, i) => (
-                        <div
+                        <><div
                             key={i}
                             className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
-                        ></div>
-                      
+                        ></div><div
+                            key={i}
+                            className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
+                        ></div></>
                     ))}
                 </div>
             </Card>

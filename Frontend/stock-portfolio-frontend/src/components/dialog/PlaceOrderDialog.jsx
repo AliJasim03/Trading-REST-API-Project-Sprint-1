@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 const PlaceOrderDialog = ({ isOpen, onClose }) => {
     const [portfolios, setPortfolios] = useState([]);
     const [stocks, setStocks] = useState([]);
+    const [holdings, setHoldings] = useState([]);
     const [orderData, setOrderData] = useState({
         portfolioId: '',
         stockId: '',
@@ -19,7 +20,7 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
         volume: '',
         buyOrSell: 'BUY',
         orderType: 'Market',
-        fees: '9.99'
+        fees: '2.00'
     });
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -27,22 +28,48 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
     const [success, setSuccess] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
-    // Access notification functions
     const { addOrderPlaced } = useNotificationContext();
 
-    // Load data when dialog opens
+    // Load portfolios & stocks when dialog opens
     useEffect(() => {
-        if (isOpen && portfolios.length === 0) {
-            loadInitialData();
-        }
+        if (isOpen && portfolios.length === 0) loadInitialData();
     }, [isOpen, portfolios.length]);
 
     // Reset form when dialog closes
     useEffect(() => {
-        if (!isOpen) {
-            resetForm();
-        }
+        if (!isOpen) resetForm();
     }, [isOpen]);
+
+    // Fetch holdings whenever a portfolio is selected
+    useEffect(() => {
+        if (orderData.portfolioId) {
+            apiService.getPortfolioHoldings(orderData.portfolioId)
+                .then(raw => {
+                    // Normalize to { stockId, quantity }
+                    const simplified = (raw || []).map(h => {
+                        const stockId = Number(
+                            h?.stockId ?? h?.stock_id ?? h?.id ?? h?.stock?.stockId
+                        );
+                        const quantity = Number(h?.quantity ?? h?.availableQuantity ?? h?.volume ?? 0);
+                        return stockId ? { stockId, quantity } : null;
+                    }).filter(Boolean);
+
+                    setHoldings(simplified);
+
+                    // If in SELL and current stock is not sellable, clear selection
+                    if (orderData.buyOrSell === 'SELL' && orderData.stockId) {
+                        const selectedId = Number(orderData.stockId);
+                        const canSell = simplified.some(h => h.stockId === selectedId && h.quantity > 0);
+                        if (!canSell) {
+                            setOrderData(prev => ({ ...prev, stockId: '' }));
+                        }
+                    }
+                })
+                .catch(err => console.error('Failed to fetch portfolio holdings:', err));
+        } else {
+            setHoldings([]);
+        }
+    }, [orderData.portfolioId, orderData.buyOrSell]);
 
     const loadInitialData = async () => {
         setLoading(true);
@@ -52,7 +79,6 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                 apiService.getAllPortfolios(),
                 apiService.getAllStocks()
             ]);
-
             setPortfolios(portfoliosData);
             setStocks(stocksData);
         } catch (err) {
@@ -65,37 +91,34 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setOrderData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setOrderData(prev => ({ ...prev, [name]: value }));
+        if (validationErrors[name]) setValidationErrors(prev => ({ ...prev, [name]: '' }));
+    };
 
-        // Clear validation error for this field
-        if (validationErrors[name]) {
-            setValidationErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
+    // Helper to get the quantity of a stock in the portfolio
+    const getHoldingQuantity = (stockId) => {
+        const sid = Number(stockId);
+        const holding = holdings.find(h => h.stockId === sid);
+        return holding ? Number(holding.quantity) : 0;
     };
 
     const validateForm = () => {
         const errors = {};
 
-        if (!orderData.portfolioId) {
-            errors.portfolioId = 'Please select a portfolio';
-        }
-        if (!orderData.stockId) {
-            errors.stockId = 'Please select a stock';
-        }
-        if (!orderData.price || parseFloat(orderData.price) <= 0) {
-            errors.price = 'Please enter a valid price greater than 0';
-        }
-        if (!orderData.volume || parseInt(orderData.volume) <= 0) {
-            errors.volume = 'Please enter a valid volume greater than 0';
-        }
-        if (!orderData.fees || parseFloat(orderData.fees) < 0) {
-            errors.fees = 'Fees must be 0 or greater';
+        if (!orderData.portfolioId) errors.portfolioId = 'Please select a portfolio';
+        if (!orderData.stockId) errors.stockId = 'Please select a stock';
+        if (!orderData.price || parseFloat(orderData.price) <= 0) errors.price = 'Please enter a valid price greater than 0';
+        if (!orderData.volume || parseInt(orderData.volume) <= 0) errors.volume = 'Please enter a valid volume greater than 0';
+        if (!orderData.fees || parseFloat(orderData.fees) < 0) errors.fees = 'Fees must be 0 or greater';
+
+        // SELL-specific validation
+        if (orderData.buyOrSell === "SELL") {
+            const available = getHoldingQuantity(orderData.stockId);
+            if (available === 0) {
+                errors.volume = 'You do not own this stock in this portfolio.';
+            } else if (parseInt(orderData.volume) > available) {
+                errors.volume = `Insufficient shares. You own only ${available}.`;
+            }
         }
 
         setValidationErrors(errors);
@@ -104,10 +127,7 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         setSubmitting(true);
         setError(null);
@@ -128,11 +148,9 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                 orderPayload
             );
 
-            // Get stock ticker for notification
             const selectedStock = stocks.find(s => s.stockId === parseInt(orderData.stockId));
             const stockTicker = selectedStock?.stockTicker || 'Unknown';
 
-            // Trigger order placed notification
             addOrderPlaced(
                 stockTicker,
                 orderData.orderType,
@@ -144,7 +162,6 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
             setSuccess(`Order placed successfully! Order ID: ${result.orderId}`);
             toast.success(`${orderData.buyOrSell} order for ${stockTicker} placed successfully!`);
 
-            // Reset form after 2 seconds and close dialog
             setTimeout(() => {
                 resetForm();
                 onClose();
@@ -165,11 +182,12 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
             volume: '',
             buyOrSell: 'BUY',
             orderType: 'Market',
-            fees: '9.99'
+            fees: '2.00'
         });
         setValidationErrors({});
         setError(null);
         setSuccess(null);
+        setHoldings([]);
     };
 
     if (loading && portfolios.length === 0) {
@@ -183,13 +201,7 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
     }
 
     return (
-        <Dialog 
-            isOpen={isOpen} 
-            onClose={onClose} 
-            title="Place New Order" 
-            size="lg"
-            closeOnOverlayClick={!submitting}
-        >
+        <Dialog isOpen={isOpen} onClose={onClose} title="Place New Order" size="lg" closeOnOverlayClick={!submitting}>
             <div className="p-6">
                 {error && (
                     <div className="mb-4 p-4 border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20 rounded-lg">
@@ -226,10 +238,8 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                             required
                         >
                             <option value="">Select Portfolio</option>
-                            {portfolios.map(portfolio => (
-                                <option key={portfolio.portfolioId} value={portfolio.portfolioId}>
-                                    {portfolio.portfolioName}
-                                </option>
+                            {portfolios.map(p => (
+                                <option key={p.portfolioId} value={p.portfolioId}>{p.portfolioName}</option>
                             ))}
                         </Select>
 
@@ -242,29 +252,21 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                             required
                         >
                             <option value="">Select Stock</option>
-                            {stocks.map(stock => (
-                                <option key={stock.stockId} value={stock.stockId}>
-                                    {stock.stockTicker} - {stock.stockName}
-                                </option>
-                            ))}
+                            {stocks
+                                .filter(stock => orderData.buyOrSell === "SELL" ? getHoldingQuantity(stock.stockId) > 0 : true)
+                                .map(stock => (
+                                    <option key={stock.stockId} value={stock.stockId}>
+                                        {stock.stockTicker} - {stock.stockName}
+                                    </option>
+                                ))}
                         </Select>
 
-                        <Select
-                            label="Order Type *"
-                            name="buyOrSell"
-                            value={orderData.buyOrSell}
-                            onChange={handleInputChange}
-                        >
+                        <Select label="Order Type *" name="buyOrSell" value={orderData.buyOrSell} onChange={handleInputChange}>
                             <option value="BUY">Buy</option>
                             <option value="SELL">Sell</option>
                         </Select>
 
-                        <Select
-                            label="Order Method *"
-                            name="orderType"
-                            value={orderData.orderType}
-                            onChange={handleInputChange}
-                        >
+                        <Select label="Order Method *" name="orderType" value={orderData.orderType} onChange={handleInputChange}>
                             <option value="Market">Market Order</option>
                             <option value="Limit">Limit Order</option>
                             <option value="Stop">Stop Order</option>
@@ -304,9 +306,10 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                         name="fees"
                         value={orderData.fees}
                         onChange={handleInputChange}
-                        placeholder="9.99"
+                        placeholder="2.00"
                         error={validationErrors.fees}
                         className="md:w-1/2"
+                        disabled
                     />
 
                     {/* Order Summary */}
@@ -332,31 +335,16 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
 
                     {/* Action Buttons */}
                     <div className="flex justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
-                        <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={resetForm}
-                            disabled={submitting}
-                            className="flex items-center"
-                        >
+                        <Button type="button" variant="outline" onClick={resetForm} disabled={submitting} className="flex items-center">
                             <RotateCcw className="w-4 h-4 mr-2" />
                             Reset
                         </Button>
 
                         <div className="flex space-x-3">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={onClose}
-                                disabled={submitting}
-                            >
+                            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
                                 Cancel
                             </Button>
-                            <Button 
-                                type="submit" 
-                                disabled={submitting}
-                                className="flex items-center"
-                            >
+                            <Button type="submit" disabled={submitting} className="flex items-center">
                                 {submitting ? (
                                     <Loading size="sm" className="mr-2" />
                                 ) : (

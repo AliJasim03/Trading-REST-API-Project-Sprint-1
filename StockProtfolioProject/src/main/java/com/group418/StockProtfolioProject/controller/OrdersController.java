@@ -19,12 +19,18 @@ public class OrdersController {
 
     // place order
     @PostMapping("/place")
-    public ResponseEntity<Orders> placeOrder(@RequestParam Integer portfolio_id,
-                                             @RequestParam Integer stock_id,
-                                             @RequestBody Orders orders_request){
-        Orders orders = ordersService.placeOrder(portfolio_id, stock_id, orders_request);
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<?> placeOrder(@RequestParam Integer portfolio_id,
+                                        @RequestParam Integer stock_id,
+                                        @RequestBody Orders orders_request) {
+        try {
+            Orders orders = ordersService.placeOrder(portfolio_id, stock_id, orders_request);
+            return ResponseEntity.ok(orders);
+        } catch (IllegalArgumentException e) {
+            // Handle validation errors (e.g. insufficient shares, insufficient capital)
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
+
 
     // get history
     @GetMapping("/history")

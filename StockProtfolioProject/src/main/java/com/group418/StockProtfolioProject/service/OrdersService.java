@@ -32,24 +32,40 @@ public class OrdersService {
         this.notificationService = notificationService;
     }
 
-    public Orders placeOrder(int portfolio_id, int stock_id, Orders orders_request){
+    public Orders placeOrder(int portfolio_id, int stock_id, Orders orders_request) {
         Portfolios portfolios = portfolioRepository.findById(portfolio_id)
                 .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found."));
         Stocks stock = stocksRepository.findById(stock_id)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock not found."));
-
+    
+        // ✅ SELL validation before saving order
+        if (orders_request.getBuy_or_sell() == Orders.BuySellType.SELL) {
+            Holdings holding = holdingsRepository
+                    .findByPortfolioPortfolioIdAndStockStockId(portfolio_id, stock_id)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "You do not own this stock in the selected portfolio."
+                    ));
+    
+            if (orders_request.getVolume() > holding.getQuantity()) {
+                throw new IllegalArgumentException(
+                        "Insufficient shares. You only own " + holding.getQuantity()
+                );
+            }
+        }
+    
         orders_request.setPortfolio(portfolios);
         orders_request.setStock(stock);
         orders_request.setStatus_code(0); // Initialized
         orders_request.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
+    
         Orders savedOrder = ordersRepository.save(orders_request);
-        
+    
         // Send notification when order is placed
         notificationService.notifyOrderPlaced(savedOrder);
-        
+    
         return savedOrder;
     }
+    
 
     public List<Orders> getTradingHistory(int portfolio_id) {
         return ordersRepository.findByPortfoliosPortfolioId(portfolio_id);

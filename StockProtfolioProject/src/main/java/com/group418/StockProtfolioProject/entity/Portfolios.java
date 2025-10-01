@@ -21,10 +21,12 @@ public class Portfolios {
     private double initialCapital;
     @Column(name ="created_at")
     private Timestamp createdAt;
-
     /*@OneToMany(mappedBy = "portfolios")
     @JsonManagedReference
     private List<Orders> orders;*/
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Holdings> holdings;
 
     public Portfolios() {}
 
@@ -34,7 +36,6 @@ public class Portfolios {
         this.description = description;
         this.initialCapital = initialCapital;
         this.createdAt = createdAt;
-        //this.orders = orders;
     }
 
     public int getPortfolioId() {
@@ -75,5 +76,13 @@ public class Portfolios {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<Holdings> getHoldings() {
+        return holdings;
+    }
+    
+    public void setHoldings(List<Holdings> holdings) {
+        this.holdings = holdings;
     }
 }
