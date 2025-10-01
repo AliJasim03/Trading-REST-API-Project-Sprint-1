@@ -30,6 +30,7 @@ class OrdersServiceTest {
     private OrdersService ordersService;
     private HoldingsRepository holdingsRepository;
     private NotificationService notificationService;
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
@@ -37,10 +38,7 @@ class OrdersServiceTest {
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
         holdingsRepository = mock(HoldingsRepository.class);
-<<<<<<< HEAD
         notificationService = mock(NotificationService.class);
-=======
->>>>>>> bd1a18c (applied order processing simulator)
         ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository, notificationService);
     }
 
