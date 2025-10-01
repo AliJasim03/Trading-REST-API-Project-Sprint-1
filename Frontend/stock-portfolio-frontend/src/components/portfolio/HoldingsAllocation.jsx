@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import { PieChart, BarChart3 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import Card from '../ui/Card';
