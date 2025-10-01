@@ -33,7 +33,13 @@ const ManageOrders = () => {
         setError(null);
         try {
             const response = await apiService.getAllOrders();
-            setOrders(response);
+            // Sort orders by most recent (createdAt descending)
+            const sortedOrders = response.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateB - dateA; // Descending order (most recent first)
+            });
+            setOrders(sortedOrders);
         } catch (err) {
             console.error('Failed to load orders:', err);
             setError(err.message);
@@ -47,7 +53,9 @@ const ManageOrders = () => {
 
         // Apply status filter
         if (filter !== 'all') {
-            const statusCode = filter === 'pending' ? 0 : filter === 'filled' ? 1 : 2;
+            const statusCode = filter === 'initialized' ? 0 : 
+                             filter === 'processing' ? 1 : 
+                             filter === 'filled' ? 2 : 3;
             filtered = filtered.filter(order => order.status_code === statusCode);
         }
 
@@ -79,7 +87,7 @@ const ManageOrders = () => {
                 )
             );
             
-            const statusText = newStatus === 1 ? 'filled' : 'rejected';
+            const statusText = newStatus === 2 ? 'filled' : 'rejected';
             setSuccess(`Order #${orderId} has been ${statusText}.`);
             
             // Clear success message after 3 seconds
@@ -92,15 +100,16 @@ const ManageOrders = () => {
         }
     };
 
-    const pendingCount = orders.filter(order => order.status_code === 0).length;
-    const filledCount = orders.filter(order => order.status_code === 1).length;
-    const rejectedCount = orders.filter(order => order.status_code === 2).length;
+    const initializedCount = orders.filter(order => order.status_code === 0).length;
+    const processingCount = orders.filter(order => order.status_code === 1).length;
+    const filledCount = orders.filter(order => order.status_code === 2).length;
+    const rejectedCount = orders.filter(order => order.status_code === 3).length;
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Manage Orders</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Track Orders</h1>
                     <p className="text-gray-600 dark:text-gray-400">View and manage all orders in the system</p>
                 </div>
                 
@@ -118,10 +127,18 @@ const ManageOrders = () => {
                     iconSize="w-8 h-8"
                 />
 
-                <StatCard 
+                {/* <StatCard 
                     icon={Clock}
-                    title="Pending"
-                    value={pendingCount}
+                    title="Initialized"
+                    value={initializedCount}
+                    iconColor="blue"
+                    iconSize="w-8 h-8"
+                /> */}
+
+                <StatCard 
+                    icon={RefreshCw}
+                    title="Processing"
+                    value={processingCount}
                     iconColor="yellow"
                     iconSize="w-8 h-8"
                 />
@@ -164,7 +181,8 @@ const ManageOrders = () => {
                             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         >
                             <option value="all">All Orders</option>
-                            <option value="pending">Pending Only</option>
+                            <option value="initialized">Initialized Only</option>
+                            <option value="processing">Processing Only</option>
                             <option value="filled">Filled Only</option>
                             <option value="rejected">Rejected Only</option>
                         </select>
@@ -206,8 +224,6 @@ const ManageOrders = () => {
             <ManageOrdersGrid 
                 orders={filteredOrders}
                 loading={loading}
-                updating={updating}
-                onUpdateStatus={handleUpdateStatus}
             />
 
             {/* Results Summary */}
