@@ -53,9 +53,9 @@ export default function QuickActions() {
                     </Link>
                 </Tooltip> */}
                 
-                <Tooltip content="Manage Orders" position="bottom">
-                    <Link to="/manage-orders">
-                        <button className={getButtonClasses('/manage-orders', 'yellow')}>
+                <Tooltip content="Track Orders" position="bottom">
+                    <Link to="/track-orders">
+                        <button className={getButtonClasses('/track-orders', 'yellow')}>
                             <Settings className="w-5 h-5" />
                         </button>
                     </Link>

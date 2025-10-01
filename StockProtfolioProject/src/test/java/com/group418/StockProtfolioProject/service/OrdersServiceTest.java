@@ -8,6 +8,7 @@ import com.group418.StockProtfolioProject.repository.OrdersRepository;
 import com.group418.StockProtfolioProject.repository.PortfolioRepository;
 import com.group418.StockProtfolioProject.repository.StocksRepository;
 import com.group418.StockProtfolioProject.repository.HoldingsRepository;
+import com.group418.StockProtfolioProject.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +37,10 @@ class OrdersServiceTest {
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
         holdingsRepository = mock(HoldingsRepository.class);
+<<<<<<< HEAD
         notificationService = mock(NotificationService.class);
+=======
+>>>>>>> bd1a18c (applied order processing simulator)
         ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository, notificationService);
     }
 

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
-import { AgGridReact } from 'ag-grid-react';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
 import { useTheme } from '../../context/ThemeContext';
@@ -116,10 +115,7 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                             key={i}
                             className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
                         ></div>
-                        <div
-                            key={i}
-                            className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
-                        ></div>
+                      
                     ))}
                 </div>
             </Card>

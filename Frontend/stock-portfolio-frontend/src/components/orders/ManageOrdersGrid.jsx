@@ -1,59 +1,14 @@
 import React from 'react';
-import { Search, Check, X, Clock, CheckCircle } from 'lucide-react';
+import { Search, Clock, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
-import { useNotificationContext } from '../../context/NotificationContext';
-import { toast } from 'react-toastify';
 
 const ManageOrdersGrid = ({ 
     orders, 
-    loading, 
-    updating, 
-    onUpdateStatus 
+    loading
 }) => {
     const navigate = useNavigate();
-    
-    // Access notification functions
-    const { addOrderFilled, addOrderRejected } = useNotificationContext();
-
-    // Enhanced status update handler with notifications
-    const handleStatusUpdate = async (orderId, newStatus) => {
-        const order = orders.find(o => o.orderId === orderId);
-        if (!order) return;
-
-        try {
-            await onUpdateStatus(orderId, newStatus);
-            
-            const stockTicker = order.stock?.stockTicker || 'Unknown';
-            const totalValue = (order.price * order.volume + order.fees).toFixed(2);
-
-            if (newStatus === 1) { // Filled
-                addOrderFilled(
-                    stockTicker,
-                    order.order_type,
-                    order.buy_or_sell,
-                    order.volume,
-                    order.price.toFixed(2),
-                    totalValue
-                );
-                toast.success(`${order.buy_or_sell} order for ${stockTicker} has been filled!`);
-            } else if (newStatus === 2) { // Rejected
-                addOrderRejected(
-                    stockTicker,
-                    order.order_type,
-                    order.buy_or_sell,
-                    order.volume,
-                    order.price.toFixed(2),
-                    'Manual rejection'
-                );
-                toast.error(`${order.buy_or_sell} order for ${stockTicker} has been rejected.`);
-            }
-        } catch (error) {
-            console.error('Failed to update order status:', error);
-            toast.error('Failed to update order status');
-        }
-    };
 
     const getStatusIcon = (statusCode) => {
         switch (statusCode) {
@@ -106,7 +61,6 @@ const ManageOrdersGrid = ({
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -149,30 +103,6 @@ const ManageOrdersGrid = ({
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {formatDate(order.createdAt)}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        {order.status_code === 0 ? (
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => handleStatusUpdate(order.orderId, 1)}
-                                                    disabled={updating[order.orderId]}
-                                                    className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 disabled:opacity-50"
-                                                    title="Mark as Filled"
-                                                >
-                                                    <Check className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleStatusUpdate(order.orderId, 2)}
-                                                    disabled={updating[order.orderId]}
-                                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
-                                                    title="Mark as Rejected"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <span className="text-gray-400 dark:text-gray-500">No actions</span>
-                                        )}
                                     </td>
                                 </tr>
                             ))}
