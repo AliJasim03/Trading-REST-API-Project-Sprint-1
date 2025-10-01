@@ -9,8 +9,6 @@ export const useTheme = () => {
   }
   return context;
 };
-
-// Hook for AG Grid theme
 export const useAgGridTheme = () => {
   const { isDarkMode } = useTheme();
   return isDarkMode ? 'ag-theme-quartz-dark' : 'ag-theme-quartz';
