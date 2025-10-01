@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react'
 import Card from '../ui/Card'
-import { useTheme } from '../../context/ThemeContext'
+import { useAgGridTheme } from '../../context/ThemeContext'
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
-
 import { AgGridReact } from 'ag-grid-react'
 
 import 'ag-grid-community/styles/ag-grid.css'
@@ -13,8 +12,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css'
 ModuleRegistry.registerModules([AllCommunityModule])
 
 export default function PortfolioSummary({ portfolioSummary }) {
-  const { isDarkMode } = useTheme()
-  const gridTheme = isDarkMode ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'
+  const gridTheme = useAgGridTheme()
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat('en-US', {
@@ -86,13 +84,14 @@ export default function PortfolioSummary({ portfolioSummary }) {
       <div
         className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
         style={{ width: '100%', padding: '0.5rem' }}
-        >
+      >
         <AgGridReact
-            rowData={portfolioSummary}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            animateRows={true}
-            domLayout="autoHeight"
+          rowData={portfolioSummary}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          animateRows
+          domLayout="autoHeight"
+          theme="legacy"
         />
       </div>
     </Card>
