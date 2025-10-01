@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import Loading from '../ui/Loading';
 import apiService from '../../services/apiService';
 
-const AddStockToWatchlistDialog = ({ isOpen, onClose, onAddStock }) => {
+const AddStockToWatchlistDialog = ({ isOpen, onClose, onAddStock, watchlistData = [] }) => {
     const [stocks, setStocks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
@@ -60,11 +60,19 @@ const AddStockToWatchlistDialog = ({ isOpen, onClose, onAddStock }) => {
         }
     };
 
-    // Filter stocks based on search query
-    const filteredStocks = stocks.filter(stock =>
-        stock.stockTicker?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        stock.stockName?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter stocks based on search query and exclude stocks already in watchlist
+    const getWatchlistedStockIds = () => {
+        return new Set(watchlistData.map(entry => entry.stock?.stockId).filter(Boolean));
+    };
+
+    const filteredStocks = stocks.filter(stock => {
+        const watchlistedIds = getWatchlistedStockIds();
+        const isNotInWatchlist = !watchlistedIds.has(stock.stockId);
+        const matchesSearch = stock.stockTicker?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            stock.stockName?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        return isNotInWatchlist && matchesSearch;
+    });
 
     return (
         <Dialog 
@@ -115,6 +123,11 @@ const AddStockToWatchlistDialog = ({ isOpen, onClose, onAddStock }) => {
                             disabled={submitting}
                         />
                     </div>
+                    {getWatchlistedStockIds().size > 0 && (
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            {getWatchlistedStockIds().size} stocks already in your watchlist are hidden from this list.
+                        </p>
+                    )}
                 </div>
 
                 {/* Stock List */}
@@ -158,10 +171,16 @@ const AddStockToWatchlistDialog = ({ isOpen, onClose, onAddStock }) => {
                         <div className="p-8 text-center">
                             <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                                No stocks found
+                                No available stocks found
                             </h3>
                             <p className="text-gray-500 dark:text-gray-400">
-                                Try searching with a different ticker symbol or company name.
+                                {stocks.filter(stock => 
+                                    stock.stockTicker?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    stock.stockName?.toLowerCase().includes(searchQuery.toLowerCase())
+                                ).length === 0 
+                                    ? "Try searching with a different ticker symbol or company name."
+                                    : "All matching stocks are already in your watchlist. Try a different search term."
+                                }
                             </p>
                         </div>
                     ) : (

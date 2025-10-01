@@ -6,8 +6,9 @@ import Loading from '../components/ui/Loading';
 import WatchlistGrid from '../components/watchlist/WatchlistGrid';
 import AddWatchlistDialog from '../components/dialog/AddWatchlistDialog';
 import AddStockToWatchlistDialog from '../components/dialog/AddStockToWatchlistDialog';
-import ViewAlertsDialog from '../components/watchlist/ViewAlertsDialog';
+import ViewAlertsDialog from '../components/dialog/ViewAlertsDialog';
 import { watchlistService } from '../services/apiService';
+import { useNotificationContext } from '../context/NotificationContext';
 import { Bell, Plus, AlertTriangle, RotateCcw } from 'lucide-react';
 
 const Watchlist = () => {
@@ -19,6 +20,9 @@ const Watchlist = () => {
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    
+    // Access notification functions
+    const { addPriceAlert, addSystemNotification } = useNotificationContext();
 
     // Load watchlist data
     const loadWatchlist = async () => {
@@ -38,6 +42,16 @@ const Watchlist = () => {
             setLoading(false);
         }
     };
+    const getUniqueWatchlistStocks = () => {
+        const stockMap = new Map();
+        
+        watchlistData.forEach(entry => {
+            if (entry.stock) {
+                stockMap.set(entry.stock.stockId, entry.stock);
+            }
+        });
+        return Array.from(stockMap.values());
+    }
 
     // Refresh watchlist
     const handleRefresh = async () => {
@@ -154,6 +168,19 @@ const Watchlist = () => {
                             <RotateCcw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                             Refresh
                         </Button>
+                        
+                        {/* Demo Notification Button */}
+                        <Button
+                            onClick={() => {
+                                addPriceAlert('AAPL', '150.00', '152.30', 'above');
+                                toast.success('Demo notification added!');
+                            }}
+                            variant="outline"
+                            className="flex items-center text-blue-600 dark:text-blue-400"
+                        >
+                            <Bell className="w-4 h-4 mr-2" />
+                            Demo Alert
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -179,14 +206,7 @@ const Watchlist = () => {
             {/* Watchlist Grid */}
             <Card>
                 <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            Your Watchlist
-                        </h2>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {watchlistData.length} stocks being watched
-                        </div>
-                    </div>
+                    
 
                     <WatchlistGrid
                         watchlistData={watchlistData}
@@ -217,6 +237,7 @@ const Watchlist = () => {
                 isOpen={isAddStockDialogOpen}
                 onClose={() => setIsAddStockDialogOpen(false)}
                 onAddStock={handleAddStockToWatchlist}
+                watchlistData={watchlistData}
             />
 
             {/* View Alerts Dialog */}

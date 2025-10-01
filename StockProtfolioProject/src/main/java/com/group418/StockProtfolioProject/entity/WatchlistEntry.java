@@ -22,6 +22,10 @@ public class WatchlistEntry {
 
     private Boolean notified = false; // track if alert sent
     
+    private BigDecimal lastTriggeredPrice; // track last price when alert was triggered
+    
+    private java.time.LocalDateTime lastTriggeredTime; // track when alert was last triggered
+    
     public WatchlistEntry() {
     }
     // getters and setters
@@ -54,6 +58,20 @@ public class WatchlistEntry {
     }
     public void setNotified(Boolean notified) {
         this.notified = notified;
+    }
+    
+    public BigDecimal getLastTriggeredPrice() {
+        return lastTriggeredPrice;
+    }
+    public void setLastTriggeredPrice(BigDecimal lastTriggeredPrice) {
+        this.lastTriggeredPrice = lastTriggeredPrice;
+    }
+    
+    public java.time.LocalDateTime getLastTriggeredTime() {
+        return lastTriggeredTime;
+    }
+    public void setLastTriggeredTime(java.time.LocalDateTime lastTriggeredTime) {
+        this.lastTriggeredTime = lastTriggeredTime;
     }
 }
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { TrendingUp, Briefcase, Plus, Search, Settings, Sun, Moon, Activity, Bell } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navigation = () => {
     const location = useLocation();
@@ -60,10 +61,16 @@ const Navigation = () => {
                                 <Moon className="w-5 h-5" />
                             )}
                         </button>
+
+                        {/* Notification Dropdown */}
+                        <NotificationDropdown />
                     </div>
 
                     {/* Mobile menu button - you can expand this later */}
                     <div className="md:hidden flex items-center space-x-2">
+                        {/* Notification Dropdown for Mobile */}
+                        <NotificationDropdown />
+                        
                         <button
                             onClick={toggleTheme}
                             className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"

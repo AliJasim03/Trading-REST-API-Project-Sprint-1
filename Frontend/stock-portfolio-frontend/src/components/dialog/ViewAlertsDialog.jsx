@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, Clock, Trash2, X, CheckCircle } from 'lucide-react';
-import Dialog from '../dialog/Dialog';
+import Dialog from './Dialog';
 import Button from '../ui/Button';
 import Loading from '../ui/Loading';
 
@@ -151,16 +151,16 @@ const ViewAlertsDialog = ({ isOpen, onClose, stock, alerts = [], onRemoveAlert }
                                         <div>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                 alert.notified 
-                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' 
+                                                    : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                             }`}>
                                                 {alert.notified ? (
                                                     <>
                                                         <Clock className="w-3 h-3 mr-1" />
-                                                        Triggered
+                                                        Recently Triggered
                                                     </>
                                                 ) : (
-                                                    'Active'
+                                                    'Monitoring'
                                                 )}
                                             </span>
                                         </div>
