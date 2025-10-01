@@ -8,8 +8,12 @@ import Portfolios from './pages/Portfolios';
 import OrderStatus from './pages/OrderStatus';
 import ManageOrders from './pages/ManageOrders';
 import LivePrices from './pages/LivePrices';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import './App.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 
+ModuleRegistry.registerModules([AllCommunityModule])
 function App() {
     return (
         <ThemeProvider>

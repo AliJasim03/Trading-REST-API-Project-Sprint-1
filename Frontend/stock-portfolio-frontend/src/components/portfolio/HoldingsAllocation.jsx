@@ -1,4 +1,3 @@
-import React from 'react';
 import { PieChart, BarChart3 } from 'lucide-react';
 import Card from '../ui/Card';
 
