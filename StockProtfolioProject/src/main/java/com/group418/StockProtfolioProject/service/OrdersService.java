@@ -40,7 +40,7 @@ public class OrdersService {
 
         orders_request.setPortfolio(portfolios);
         orders_request.setStock(stock);
-        orders_request.setStatus_code(0); // Pending
+        orders_request.setStatus_code(0); // Initialized
         orders_request.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
         Orders savedOrder = ordersRepository.save(orders_request);

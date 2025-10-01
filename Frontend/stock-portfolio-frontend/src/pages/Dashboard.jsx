@@ -88,8 +88,8 @@ const Dashboard = () => {
                 }
             }
 
-            const pendingOrders = allOrders.filter(order => order.status_code === 0).length;
-            const filledOrders = allOrders.filter(order => order.status_code === 1).length;
+            const pendingOrders = allOrders.filter(order => order.status_code === 1).length;
+            const filledOrders = allOrders.filter(order => order.status_code === 2).length;
 
             setStats({
                 totalPortfolios: summary.length,

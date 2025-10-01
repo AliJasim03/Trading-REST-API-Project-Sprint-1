@@ -25,3 +25,6 @@ replay_pid*
 
 **/node_modules/
 .idea/
+
+# add_price_history.sql
+db/add_price_history.sql
