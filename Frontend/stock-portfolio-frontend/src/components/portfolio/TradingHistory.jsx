@@ -1,18 +1,13 @@
 import React, { useMemo } from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
-import { AgGridReact } from 'ag-grid-react';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
-import { useTheme } from '../../context/ThemeContext';
-
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useAgGridTheme, useTheme } from '../../context/ThemeContext';
 
 const TradingHistory = ({ tradingHistory, loading }) => {
-    const { isDarkMode } = useTheme();
-    const gridTheme = isDarkMode ? 'ag-theme-alpine-dark' : 'ag-theme-alpine';
 
+const agGridTheme = useAgGridTheme();
     const columnDefs = useMemo(() => [
         {
             headerName: 'Stock',
@@ -106,9 +101,7 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         Trading History
                     </h3>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        Trading History
-                    </h3>
+            
                 </div>
                 <div className="animate-pulse space-y-3">
                     {[...Array(5)].map((_, i) => (
@@ -116,10 +109,7 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                             key={i}
                             className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
                         ></div>
-                        <div
-                            key={i}
-                            className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
-                        ></div>
+                      
                     ))}
                 </div>
             </Card>
@@ -132,10 +122,6 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     Trading History
                 </h3>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    Trading History
-                </h3>
-                <Calendar className="w-5 h-5 text-gray-400" />
             </div>
 
 
@@ -146,7 +132,7 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                 </div>
             ) : (
                 <div
-                    className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
+                    className={`${agGridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
                     style={{ width: '100%', height: '100%' }}
                 >
                     <AgGridReact
@@ -154,8 +140,9 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         animateRows={true}
-                        theme="leagcy"
+                        theme="legacy"
                         domLayout='autoHeight'
+                        pagination={true}
                     />
                 </div>
             )}

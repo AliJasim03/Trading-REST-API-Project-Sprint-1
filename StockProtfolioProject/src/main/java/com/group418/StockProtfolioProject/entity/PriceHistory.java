@@ -12,7 +12,7 @@ public class PriceHistory {
     @Column(name = "price_id")
     private int priceId;
     private double price;
-    @Column(name = "created_at")
+    @Column(name = "recorded_at")
     private java.sql.Timestamp createdAt;
 
     @ManyToOne

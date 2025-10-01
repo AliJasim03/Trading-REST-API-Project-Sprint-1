@@ -8,6 +8,7 @@ import com.group418.StockProtfolioProject.repository.OrdersRepository;
 import com.group418.StockProtfolioProject.repository.PortfolioRepository;
 import com.group418.StockProtfolioProject.repository.StocksRepository;
 import com.group418.StockProtfolioProject.repository.HoldingsRepository;
+import com.group418.StockProtfolioProject.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,6 +29,7 @@ class OrdersServiceTest {
     private StocksRepository stocksRepository;
     private OrdersService ordersService;
     private HoldingsRepository holdingsRepository;
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +37,7 @@ class OrdersServiceTest {
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
         holdingsRepository = mock(HoldingsRepository.class);
-        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository);
+        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository, notificationService);
     }
 
     @Test

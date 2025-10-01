@@ -19,13 +19,14 @@ class WatchlistAlertSchedulerTest {
 
     @Mock private WatchlistRepository watchlistRepository;
     @Mock private LivePriceService livePriceService;
+    @Mock private NotificationService notificationService;
 
     private WatchlistAlertScheduler scheduler;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        scheduler = new WatchlistAlertScheduler(watchlistRepository, livePriceService);
+        scheduler = new WatchlistAlertScheduler(watchlistRepository, livePriceService, notificationService);
     }
 
     @Test
