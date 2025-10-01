@@ -22,7 +22,7 @@ const WatchlistGrid = ({ watchlistData = [], loading = false, onAddAlert, onView
                         alertCount: 0,
                         activeAlertCount: 0,
                         // Mock current price and change for now (will be from live prices later)
-                        currentPrice: Math.random() * 200 + 50,
+                        currentPrice: Math.random() * 50 + 50,
                         priceChange: (Math.random() - 0.5) * 10
                     });
                 }
@@ -99,19 +99,24 @@ const WatchlistGrid = ({ watchlistData = [], loading = false, onAddAlert, onView
             <div className="mb-4 flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                        Your Watchlist ({watchlistStocks.length} stocks)
+                        Your Watchlist 
                     </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {/* <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {watchlistData.filter(alert => alert.targetPrice !== null && !alert.notified).length} active alerts across all stocks
-                    </p>
+                    </p> */}
                 </div>
-                <Button
-                    onClick={onAddStock}
-                    className="flex items-center"
-                >
+                <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-4">
+                    <p>{watchlistStocks.length} stocks being watched</p>
+                    <Button
+                        onClick={onAddStock}
+                        className="flex items-center"
+                    >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Stock
                 </Button>
+               
+                </div>
+                
             </div>
             
             <div className="overflow-x-auto">
@@ -181,8 +186,7 @@ const WatchlistGrid = ({ watchlistData = [], loading = false, onAddAlert, onView
                                             className="flex items-center"
                                             title="Add price alert"
                                         >
-                                            <Plus className="w-3 h-3 mr-1" />
-                                            Add Alert
+                                            <Plus className="w-3 h-3" />
                                         </Button>
                                         {stock.alertCount > 0 && (
                                             <Button
@@ -192,8 +196,7 @@ const WatchlistGrid = ({ watchlistData = [], loading = false, onAddAlert, onView
                                                 className="flex items-center"
                                                 title="View existing alerts"
                                             >
-                                                <Eye className="w-3 h-3 mr-1" />
-                                                View ({stock.alertCount})
+                                                <Eye className="w-3 h-3" />
                                             </Button>
                                         )}
                                         <Button
@@ -203,8 +206,7 @@ const WatchlistGrid = ({ watchlistData = [], loading = false, onAddAlert, onView
                                             className="flex items-center text-red-600 hover:text-red-700 hover:border-red-300"
                                             title="Remove from watchlist"
                                         >
-                                            <Trash2 className="w-3 h-3 mr-1" />
-                                            Remove
+                                            <Trash2 className="w-3 h-3" />
                                         </Button>
                                     </div>
                                 </td>

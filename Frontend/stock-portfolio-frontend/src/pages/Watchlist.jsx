@@ -6,8 +6,9 @@ import Loading from '../components/ui/Loading';
 import WatchlistGrid from '../components/watchlist/WatchlistGrid';
 import AddWatchlistDialog from '../components/dialog/AddWatchlistDialog';
 import AddStockToWatchlistDialog from '../components/dialog/AddStockToWatchlistDialog';
-import ViewAlertsDialog from '../components/watchlist/ViewAlertsDialog';
+import ViewAlertsDialog from '../components/dialog/ViewAlertsDialog';
 import { watchlistService } from '../services/apiService';
+import { useNotificationContext } from '../context/NotificationContext';
 import { Bell, Plus, AlertTriangle, RotateCcw } from 'lucide-react';
 
 const Watchlist = () => {
@@ -19,6 +20,9 @@ const Watchlist = () => {
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    
+    // Access notification functions (for potential future use with watchlist alerts)
+    const { addPriceAlert } = useNotificationContext();
 
     // Load watchlist data
     const loadWatchlist = async () => {
@@ -179,14 +183,7 @@ const Watchlist = () => {
             {/* Watchlist Grid */}
             <Card>
                 <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            Your Watchlist
-                        </h2>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {watchlistData.length} stocks being watched
-                        </div>
-                    </div>
+                    
 
                     <WatchlistGrid
                         watchlistData={watchlistData}
@@ -217,6 +214,7 @@ const Watchlist = () => {
                 isOpen={isAddStockDialogOpen}
                 onClose={() => setIsAddStockDialogOpen(false)}
                 onAddStock={handleAddStockToWatchlist}
+                watchlistData={watchlistData}
             />
 
             {/* View Alerts Dialog */}

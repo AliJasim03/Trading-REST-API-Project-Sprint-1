@@ -9,4 +9,10 @@ import java.util.List;
 public interface WatchlistRepository extends JpaRepository<WatchlistEntry, Long> {
     List<WatchlistEntry> findByNotifiedFalse();
     List<WatchlistEntry> findByStock(Stocks stock);
+    
+    // Find entries that have actual alerts set and are not yet notified
+    List<WatchlistEntry> findByNotifiedFalseAndTargetPriceIsNotNullAndAlertDirectionIsNotNull();
+    
+    // Find all entries that have alerts set (including previously triggered ones)
+    List<WatchlistEntry> findByTargetPriceIsNotNullAndAlertDirectionIsNotNull();
 }

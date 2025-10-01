@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { NotificationProvider } from './context/NotificationContext';
 import Navigation from './components/ui/Navigation';
 import Dashboard from './pages/Dashboard';
 import Portfolios from './pages/Portfolios';
@@ -19,33 +20,35 @@ ModuleRegistry.registerModules([AllCommunityModule])
 function App() {
     return (
         <ThemeProvider>
-            <Router>
-                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-                    <Navigation />
-                    <main>
-                        <Routes>
-                            <Route path="/" element={<Dashboard />} />
-                            <Route path="/portfolios" element={<Portfolios />} />
-                            <Route path="/order-status" element={<OrderStatus />} />
-                            <Route path="/manage-orders" element={<ManageOrders />} />
-                            <Route path="/live-prices" element={<LivePrices />} />
-                            <Route path="/watchlist" element={<Watchlist />} />
-                        </Routes>
-                    </main>
-                    <ToastContainer
-                        position="top-right"
-                        autoClose={3000}
-                        hideProgressBar={false}
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        theme="colored"
-                    />
-                </div>
-            </Router>
+            <NotificationProvider>
+                <Router>
+                    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+                        <Navigation />
+                        <main>
+                            <Routes>
+                                <Route path="/" element={<Dashboard />} />
+                                <Route path="/portfolios" element={<Portfolios />} />
+                                <Route path="/order-status" element={<OrderStatus />} />
+                                <Route path="/manage-orders" element={<ManageOrders />} />
+                                <Route path="/live-prices" element={<LivePrices />} />
+                                <Route path="/watchlist" element={<Watchlist />} />
+                            </Routes>
+                        </main>
+                        <ToastContainer
+                            position="top-right"
+                            autoClose={3000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="colored"
+                        />
+                    </div>
+                </Router>
+            </NotificationProvider>
         </ThemeProvider>
     );
 }

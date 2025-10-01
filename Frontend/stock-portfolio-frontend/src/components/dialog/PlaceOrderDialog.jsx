@@ -6,6 +6,8 @@ import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Loading from '../ui/Loading';
 import apiService from '../../services/apiService';
+import { useNotificationContext } from '../../context/NotificationContext';
+import { toast } from 'react-toastify';
 
 const PlaceOrderDialog = ({ isOpen, onClose }) => {
     const [portfolios, setPortfolios] = useState([]);
@@ -24,6 +26,9 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+
+    // Access notification functions
+    const { addOrderPlaced } = useNotificationContext();
 
     // Load data when dialog opens
     useEffect(() => {
@@ -123,7 +128,21 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                 orderPayload
             );
 
+            // Get stock ticker for notification
+            const selectedStock = stocks.find(s => s.stockId === parseInt(orderData.stockId));
+            const stockTicker = selectedStock?.stockTicker || 'Unknown';
+
+            // Trigger order placed notification
+            addOrderPlaced(
+                stockTicker,
+                orderData.orderType,
+                orderData.buyOrSell,
+                parseInt(orderData.volume),
+                parseFloat(orderData.price)
+            );
+
             setSuccess(`Order placed successfully! Order ID: ${result.orderId}`);
+            toast.success(`${orderData.buyOrSell} order for ${stockTicker} placed successfully!`);
 
             // Reset form after 2 seconds and close dialog
             setTimeout(() => {
