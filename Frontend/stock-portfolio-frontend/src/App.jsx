@@ -1,8 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
-import { AgGridReact } from 'ag-grid-react';
-import { ToastContainer } from 'react-toastify';
 import Navigation from './components/ui/Navigation';
 import Dashboard from './pages/Dashboard';
 import Portfolios from './pages/Portfolios';
@@ -11,6 +9,7 @@ import ManageOrders from './pages/ManageOrders';
 import LivePrices from './pages/LivePrices';
 import Watchlist from './pages/Watchlist';
 import './App.css';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
