@@ -28,6 +28,7 @@ class OrdersServiceTest {
     private StocksRepository stocksRepository;
     private OrdersService ordersService;
     private HoldingsRepository holdingsRepository;
+    private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +36,8 @@ class OrdersServiceTest {
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
         holdingsRepository = mock(HoldingsRepository.class);
-        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository);
+        notificationService = mock(NotificationService.class);
+        ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository, notificationService);
     }
 
     @Test
