@@ -160,15 +160,15 @@ public class PortfolioService {
         // Get all orders for this portfolio
         List<Orders> allOrders = ordersRepository.findByPortfoliosPortfolioId(portfolioId);
         
-        // Calculate total invested (from filled buy orders)
+        // Calculate total invested (from filled buy orders) - status_code 2 = Filled
         double totalInvested = allOrders.stream()
-            .filter(order -> order.getBuy_or_sell() == Orders.BuySellType.BUY && order.getStatus_code() == 1)
+            .filter(order -> order.getBuy_or_sell() == Orders.BuySellType.BUY && order.getStatus_code() == 2)
             .mapToDouble(order -> order.getVolume() * order.getPrice() + order.getFees())
             .sum();
             
-        // Calculate total sold (from filled sell orders)
+        // Calculate total sold (from filled sell orders) - status_code 2 = Filled
         double totalSold = allOrders.stream()
-            .filter(order -> order.getBuy_or_sell() == Orders.BuySellType.SELL && order.getStatus_code() == 1)
+            .filter(order -> order.getBuy_or_sell() == Orders.BuySellType.SELL && order.getStatus_code() == 2)
             .mapToDouble(order -> order.getVolume() * order.getPrice() - order.getFees())
             .sum();
             
@@ -186,17 +186,33 @@ public class PortfolioService {
     }
     
     public double calculatePortfolioValue(List<Holdings> holdings) {
+        System.out.println("=== DEBUG: calculatePortfolioValue ===");
+        System.out.println("Holdings count: " + holdings.size());
+        
         return holdings.stream()
             .mapToDouble(holding -> {
                 try {
+                    System.out.println("Processing holding for stock ID: " + holding.getStock().getStockId() + 
+                                     " (" + holding.getStock().getStockTicker() + "), quantity: " + holding.getQuantity());
+                    
                     // Get latest price for the stock
                     List<PriceHistory> priceHistory = priceHistoryRepository
                         .findByStockStockIdOrderByCreatedAtDesc(holding.getStock().getStockId());
+                    
+                    System.out.println("Price history entries found: " + priceHistory.size());
+                    
                     if (!priceHistory.isEmpty()) {
-                        return holding.getQuantity() * priceHistory.get(0).getPrice();
+                        double price = priceHistory.get(0).getPrice();
+                        double value = holding.getQuantity() * price;
+                        System.out.println("Latest price: " + price + ", calculated value: " + value);
+                        return value;
+                    } else {
+                        System.out.println("No price history found for stock ID: " + holding.getStock().getStockId());
                     }
                     return 0.0;
                 } catch (Exception e) {
+                    System.out.println("Error calculating value for holding: " + e.getMessage());
+                    e.printStackTrace();
                     return 0.0;
                 }
             })
