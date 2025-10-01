@@ -34,19 +34,25 @@ export const ThemeProvider = ({ children }) => {
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
-    const toggleTheme = () => {
-        setIsDarkMode(prev => !prev);
-    };
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
 
-    const value = {
-        isDarkMode,
-        toggleTheme,
-    };
+  const value = { isDarkMode, toggleTheme };
 
-    return (
-        <ThemeContext.Provider value={value}>
-            {children}
-        </ThemeContext.Provider>
-    );
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };

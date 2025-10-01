@@ -1,9 +1,9 @@
 import {useMemo} from 'react';
 import { Calendar, Clock } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
 import { useTheme } from '../../context/ThemeContext';
-import { AgGridReact } from 'ag-grid-react';
 
 
 const TradingHistory = ({ tradingHistory, loading }) => {
@@ -99,11 +99,16 @@ const TradingHistory = ({ tradingHistory, loading }) => {
         return (
             <Card className="p-6 mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Trading History</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Trading History
+                    </h3>
                 </div>
                 <div className="animate-pulse space-y-3">
                     {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div
+                            key={i}
+                            className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
+                        ></div>
                     ))}
                 </div>
             </Card>
@@ -113,10 +118,12 @@ const TradingHistory = ({ tradingHistory, loading }) => {
     return (
         <Card className="p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Trading History</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Trading History
+                </h3>
                 <Calendar className="w-5 h-5 text-gray-400" />
             </div>
-            
+
             {!tradingHistory || tradingHistory.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />

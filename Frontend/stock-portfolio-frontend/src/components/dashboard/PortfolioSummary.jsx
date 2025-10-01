@@ -76,7 +76,7 @@ export default function PortfolioSummary({ portfolioSummary }) {
       <div
         className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
         style={{ width: '100%', padding: '0.5rem' }}
-        >
+      >
         <AgGridReact
           rowData={portfolioSummary}
           columnDefs={columnDefs}

@@ -15,10 +15,10 @@ public class WatchlistEntry {
     @JoinColumn(name = "stock_id")
     private Stocks stock;
 
-    private BigDecimal targetPrice;
+    private BigDecimal targetPrice; // Can be null for stocks without alerts
 
     @Enumerated(EnumType.STRING)
-    private AlertDirection alertDirection; // ABOVE or BELOW
+    private AlertDirection alertDirection; // Can be null for stocks without alerts
 
     private Boolean notified = false; // track if alert sent
     
