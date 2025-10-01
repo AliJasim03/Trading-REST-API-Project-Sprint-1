@@ -109,7 +109,7 @@ public class Orders {
 
     public void setOrder_type(OrderType order_type) {
         this.orderType = order_type;
-    }
+    }    
 
     public void setStatus_code(int status_code) {
         this.statusCode = status_code;

@@ -1,14 +1,17 @@
-import {useMemo} from 'react';
+import React, { useMemo } from 'react';
 import { Calendar, Clock } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
 import { AgGridReact } from 'ag-grid-react';
 import Card from '../ui/Card';
 import StatusBadge from '../ui/StatusBadge';
 import { useTheme } from '../../context/ThemeContext';
 
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const TradingHistory = ({ tradingHistory, loading }) => {
-     const { isDarkMode } = useTheme();
-    const gridTheme = isDarkMode ? 'ag-theme-quartz-dark' : 'ag-theme-quartz';
+    const { isDarkMode } = useTheme();
+    const gridTheme = isDarkMode ? 'ag-theme-alpine-dark' : 'ag-theme-alpine';
 
     const columnDefs = useMemo(() => [
         {
@@ -95,6 +98,7 @@ const TradingHistory = ({ tradingHistory, loading }) => {
         }),
         []
     );
+
     if (loading) {
         return (
             <Card className="p-6 mb-8">
@@ -102,9 +106,16 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         Trading History
                     </h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Trading History
+                    </h3>
                 </div>
                 <div className="animate-pulse space-y-3">
                     {[...Array(5)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
+                        ></div>
                         <div
                             key={i}
                             className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
@@ -121,8 +132,12 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     Trading History
                 </h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Trading History
+                </h3>
                 <Calendar className="w-5 h-5 text-gray-400" />
             </div>
+
 
             {!tradingHistory || tradingHistory.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -130,82 +145,17 @@ const TradingHistory = ({ tradingHistory, loading }) => {
                     <p className="text-sm">No trading history found</p>
                 </div>
             ) : (
-                // <div className="overflow-x-auto">
-                //     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                //         <thead className="bg-gray-50 dark:bg-gray-800">
-                //             <tr>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Stock
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Type
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Quantity
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Price
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Total
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Status
-                //                 </th>
-                //                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                //                     Date
-                //                 </th>
-                //             </tr>
-                //         </thead>
-                //         <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                //             {tradingHistory.map((order, index) => (
-                //                 <tr key={`${order.orderId}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                //                         <div>{order.stock?.stockTicker || 'N/A'}</div>
-                //                         <div className="text-xs text-gray-500 dark:text-gray-400">{order.stock?.stockName || ''}</div>
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                //                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                //                             order.buy_or_sell === 'BUY'
-                //                                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                //                                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                //                         }`}>
-                //                             {order.buy_or_sell}
-                //                         </span>
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                //                         {order.volume}
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                //                         ${order.price?.toFixed(2) || '0.00'}
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                //                         ${((order.price || 0) * (order.volume || 0)).toFixed(2)}
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap">
-                //                         <StatusBadge status={order.status_code} />
-                //                     </td>
-                //                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                //                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
-                //                     </td>
-                //                 </tr>
-                //             ))}
-                //         </tbody>
-                //     </table>
-                // </div>
-                 <div
+                <div
                     className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
-                    style={{ width: '100%', padding: '0.5rem' }}
+                    style={{ width: '100%', height: '100%' }}
                 >
                     <AgGridReact
                         rowData={tradingHistory}
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         animateRows={true}
-                        pagination={true}
-                        paginationPageSize={10}
-                        theme="legacy"
-                        domLayout="autoHeight"
+                        theme="leagcy"
+                        domLayout='autoHeight'
                     />
                 </div>
             )}
@@ -214,3 +164,4 @@ const TradingHistory = ({ tradingHistory, loading }) => {
 };
 
 export default TradingHistory;
+

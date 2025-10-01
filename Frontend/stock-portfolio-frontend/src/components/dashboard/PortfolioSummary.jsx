@@ -75,15 +75,15 @@ export default function PortfolioSummary({ portfolioSummary }) {
 
       <div
         className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
-        style={{ width: '100%', padding: '0.5rem' }}
-      >
+        style={{ width: '100%', height: '100%' }}
+        >
         <AgGridReact
-          rowData={portfolioSummary}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          animateRows
-          domLayout="autoHeight"
-          theme="legacy"
+            rowData={portfolioSummary}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            animateRows={true}
+            theme="legacy"
+            domLayout="autoHeight"
         />
       </div>
     </Card>
