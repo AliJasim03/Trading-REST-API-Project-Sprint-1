@@ -156,6 +156,12 @@ public class OrdersService {
         if (existingHolding.isPresent()) {
             holding = existingHolding.get();
         } else {
+            // For SELL orders, we must have existing holdings
+            if (order.getBuy_or_sell() == Orders.BuySellType.SELL) {
+                throw new IllegalArgumentException("Cannot sell stock: No holdings found for " + 
+                    order.getStock().getStockTicker() + " in this portfolio");
+            }
+            // Create new holding for BUY orders
             holding = new Holdings();
             holding.setPortfolio(order.getPortfolio());
             holding.setStock(order.getStock());
@@ -168,7 +174,10 @@ public class OrdersService {
         } else if (order.getBuy_or_sell() == Orders.BuySellType.SELL) {
             // Check if we have enough shares to sell
             if (holding.getQuantity() < order.getVolume()) {
-                throw new IllegalArgumentException("Insufficient shares to sell. Available: " + holding.getQuantity() + ", Requested: " + order.getVolume());
+                throw new IllegalArgumentException(
+                    String.format("Insufficient shares to sell. Available: %d, Requested: %d for %s", 
+                        holding.getQuantity(), order.getVolume(), order.getStock().getStockTicker())
+                );
             }
             // Reduce holdings
             holding.setQuantity(holding.getQuantity() - order.getVolume());

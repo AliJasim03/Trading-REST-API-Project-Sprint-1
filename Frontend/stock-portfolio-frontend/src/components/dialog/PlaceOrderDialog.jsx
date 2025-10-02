@@ -43,8 +43,10 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
     // Fetch holdings whenever a portfolio is selected
     useEffect(() => {
         if (orderData.portfolioId) {
-            apiService.getPortfolioHoldings(orderData.portfolioId)
-                .then(raw => {
+            // Use dashboard API which includes holdings data
+            apiService.getPortfolioDashboard(orderData.portfolioId)
+                .then(dashboardData => {
+                    const raw = dashboardData?.holdings || [];
                     // Normalize to { stockId, quantity }
                     const simplified = (raw || []).map(h => {
                         const stockId = Number(
@@ -65,7 +67,7 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                         }
                     }
                 })
-                .catch(err => console.error('Failed to fetch portfolio holdings:', err));
+                .catch(err => console.error('Failed to fetch portfolio dashboard:', err));
         } else {
             setHoldings([]);
         }
@@ -252,13 +254,26 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                             required
                         >
                             <option value="">Select Stock</option>
-                            {stocks
-                                .filter(stock => orderData.buyOrSell === "SELL" ? getHoldingQuantity(stock.stockId) > 0 : true)
-                                .map(stock => (
-                                    <option key={stock.stockId} value={stock.stockId}>
+                            {stocks.map(stock => {
+                                const holdingQty = getHoldingQuantity(stock.stockId);
+                                const canSell = holdingQty > 0;
+                                const isDisabled = orderData.buyOrSell === "SELL" && !canSell;
+                                
+                                return (
+                                    <option 
+                                        key={stock.stockId} 
+                                        value={stock.stockId}
+                                        disabled={isDisabled}
+                                        style={isDisabled ? { color: '#9CA3AF', fontStyle: 'italic' } : {}}
+                                    >
                                         {stock.stockTicker} - {stock.stockName}
+                                        {orderData.buyOrSell === "SELL" ? 
+                                            (canSell ? ` (${holdingQty} available)` : ' (Not owned)') : 
+                                            ''
+                                        }
                                     </option>
-                                ))}
+                                );
+                            })}
                         </Select>
 
                         <Select label="Order Type *" name="buyOrSell" value={orderData.buyOrSell} onChange={handleInputChange}>
@@ -285,18 +300,88 @@ const PlaceOrderDialog = ({ isOpen, onClose }) => {
                             required
                         />
 
-                        <Input
-                            label="Volume (Number of Shares) *"
-                            type="number"
-                            min="1"
-                            name="volume"
-                            value={orderData.volume}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                            error={validationErrors.volume}
-                            required
-                        />
+                        <div className="space-y-2">
+                            <Input
+                                label={
+                                    orderData.buyOrSell === 'SELL' && orderData.stockId ? 
+                                    `Volume (Number of Shares) * - Max: ${getHoldingQuantity(orderData.stockId)}` :
+                                    "Volume (Number of Shares) *"
+                                }
+                                type="number"
+                                min="1"
+                                max={orderData.buyOrSell === 'SELL' && orderData.stockId ? getHoldingQuantity(orderData.stockId) : undefined}
+                                name="volume"
+                                value={orderData.volume}
+                                onChange={handleInputChange}
+                                placeholder={orderData.buyOrSell === 'SELL' && orderData.stockId ? 
+                                    `Max: ${getHoldingQuantity(orderData.stockId)}` : "0"
+                                }
+                                error={validationErrors.volume}
+                                required
+                            />
+                            
+                            {/* Quick-fill buttons for SELL orders */}
+                            {orderData.buyOrSell === 'SELL' && orderData.stockId && getHoldingQuantity(orderData.stockId) > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setOrderData(prev => ({ ...prev, volume: Math.floor(getHoldingQuantity(orderData.stockId) * 0.25).toString() }))}
+                                        className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded"
+                                    >
+                                        25%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setOrderData(prev => ({ ...prev, volume: Math.floor(getHoldingQuantity(orderData.stockId) * 0.5).toString() }))}
+                                        className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded"
+                                    >
+                                        50%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setOrderData(prev => ({ ...prev, volume: Math.floor(getHoldingQuantity(orderData.stockId) * 0.75).toString() }))}
+                                        className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded"
+                                    >
+                                        75%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setOrderData(prev => ({ ...prev, volume: getHoldingQuantity(orderData.stockId).toString() }))}
+                                        className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-300 rounded"
+                                    >
+                                        All
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    {/* Holdings Summary for SELL orders */}
+                    {orderData.buyOrSell === 'SELL' && orderData.portfolioId && (
+                        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2 flex items-center">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                Your Holdings in This Portfolio
+                            </h4>
+                            {holdings.length === 0 ? (
+                                <p className="text-sm text-blue-700 dark:text-blue-300">
+                                    No holdings found in this portfolio. You need to own stocks before you can sell them.
+                                </p>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {holdings.map(holding => {
+                                        const stock = stocks.find(s => s.stockId === holding.stockId);
+                                        return (
+                                            <div key={holding.stockId} className="text-sm text-blue-700 dark:text-blue-300 flex justify-between bg-white dark:bg-gray-800 px-2 py-1 rounded">
+                                                <span>{stock?.stockTicker || 'Unknown'}</span>
+                                                <span className="font-medium">{holding.quantity} shares</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <Input
                         label="Transaction Fees"
