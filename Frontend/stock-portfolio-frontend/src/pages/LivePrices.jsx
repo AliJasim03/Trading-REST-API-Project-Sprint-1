@@ -1,408 +1,410 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Search, TrendingUp, TrendingDown, RefreshCw, Activity, DollarSign, Eye, Plus } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, TrendingDown, RefreshCw, Plus, X, Star, Activity, DollarSign } from 'lucide-react';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import Loading from '../components/ui/Loading';
-import { livePrices } from '../services/apiService';
-import QuickActions from '../components/ui/QuickActions';
+import apiService from '../services/apiService';
 
 const LivePrices = () => {
-    const [popularStocks, setPopularStocks] = useState([]);
-    const [selectedStock, setSelectedStock] = useState(null);
-    const [historicalData, setHistoricalData] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [searching, setSearching] = useState(false);
-    const [loadingChart, setLoadingChart] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
+    const [watchedStocks, setWatchedStocks] = useState(['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA']);
+    const [stockData, setStockData] = useState({});
+    const [loading, setLoading] = useState({});
     const [error, setError] = useState(null);
-    const [chartPeriod, setChartPeriod] = useState('daily');
+    const [newSymbol, setNewSymbol] = useState('');
     const [autoRefresh, setAutoRefresh] = useState(true);
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [priceHistory, setPriceHistory] = useState({});
 
-    // Auto-refresh interval
     useEffect(() => {
-        let interval;
+        fetchAllStockData();
         if (autoRefresh) {
-            interval = setInterval(() => {
-                loadPopularStocks();
-                if (selectedStock) {
-                    loadHistoricalData(selectedStock.symbol);
-                }
-            }, 60000); // Refresh every minute
+            const interval = setInterval(fetchAllStockData, 30000); // Refresh every 30 seconds
+            return () => clearInterval(interval);
         }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [autoRefresh, selectedStock]);
+    }, [watchedStocks, autoRefresh]);
 
-    useEffect(() => {
-        loadPopularStocks();
-    }, []);
-
-    useEffect(() => {
-        if (selectedStock) {
-            loadHistoricalData(selectedStock.symbol);
-        }
-    }, [selectedStock, chartPeriod]);
-
-    const loadPopularStocks = async (showRefreshing = false) => {
-        if (showRefreshing) setRefreshing(true);
-        if (!showRefreshing) setLoading(true);
-        setError(null);
-
-        try {
-            const stocks = await livePrices.getPopularStocks();
-            setPopularStocks(stocks.filter(stock => !stock.error));
-
-            // Set first stock as selected if none selected
-            if (!selectedStock && stocks.length > 0 && !stocks[0].error) {
-                setSelectedStock(stocks[0]);
+    const fetchAllStockData = async () => {
+        for (const symbol of watchedStocks) {
+            if (!loading[symbol]) {
+                fetchStockData(symbol);
             }
-        } catch (err) {
-            console.error('Failed to load popular stocks:', err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
         }
     };
 
-    const loadHistoricalData = async (symbol) => {
-        setLoadingChart(true);
+    const fetchStockData = async (symbol) => {
+        setLoading(prev => ({ ...prev, [symbol]: true }));
+        setError(null);
         try {
-            const data = await livePrices.getHistoricalData(symbol, chartPeriod);
-            setHistoricalData(data);
+            const data = await apiService.getLivePriceBySymbol(symbol);
+            setStockData(prev => ({
+                ...prev,
+                [symbol]: data
+            }));
+
+            // Generate mock historical data for the chart
+            generatePriceHistory(symbol, data);
         } catch (err) {
-            console.error('Failed to load historical data:', err);
-            setError(err.message);
+            console.error(`Failed to fetch price for ${symbol}:`, err);
+            setError(`Failed to fetch ${symbol}: ${err.message}`);
         } finally {
-            setLoadingChart(false);
+            setLoading(prev => ({ ...prev, [symbol]: false }));
         }
     };
 
-    const handleSearch = async () => {
-        if (!searchQuery.trim()) return;
+    const generatePriceHistory = (symbol, currentData) => {
+        // Generate 24 hours of mock historical data based on current price
+        const history = [];
+        const currentPrice = currentData.currentPrice;
+        const volatility = currentData.percentChange || 0;
 
-        setSearching(true);
-        try {
-            const results = await livePrices.searchStocks(searchQuery);
-            setSearchResults(results);
-        } catch (err) {
-            console.error('Search failed:', err);
-            setError(err.message);
-        } finally {
-            setSearching(false);
+        for (let i = 23; i >= 0; i--) {
+            const time = new Date();
+            time.setHours(time.getHours() - i);
+            const randomChange = (Math.random() - 0.5) * Math.abs(volatility) * 0.1;
+            const price = currentPrice * (1 - (volatility / 100) * (i / 24) + randomChange);
+
+            history.push({
+                time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                price: parseFloat(price.toFixed(2)),
+                timestamp: time.getTime()
+            });
         }
-    };
 
-    const handleStockSelect = (stock) => {
-        setSelectedStock(stock);
-        setSearchResults([]);
-        setSearchQuery('');
-    };
-
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(price);
-    };
-
-    const formatPercent = (percent) => {
-        const num = typeof percent === 'string' ? parseFloat(percent) : percent;
-        return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
-    };
-
-    const formatChartData = (data) => {
-        if (!data || !data.data) return [];
-
-        return data.data.slice(0, 100).reverse().map((item, index) => ({
-            name: new Date(item.timestamp).toLocaleDateString(),
-            price: parseFloat(item.close),
-            volume: item.volume,
-            high: parseFloat(item.high),
-            low: parseFloat(item.low),
-            open: parseFloat(item.open)
+        setPriceHistory(prev => ({
+            ...prev,
+            [symbol]: history
         }));
     };
 
-    if (loading) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <Loading />
-            </div>
-        );
-    }
+    const addStock = () => {
+        const symbol = newSymbol.toUpperCase().trim();
+        if (symbol && !watchedStocks.includes(symbol)) {
+            setWatchedStocks(prev => [...prev, symbol]);
+            setNewSymbol('');
+            fetchStockData(symbol);
+        }
+    };
+
+    const removeStock = (symbol) => {
+        setWatchedStocks(prev => prev.filter(s => s !== symbol));
+        setStockData(prev => {
+            const newData = { ...prev };
+            delete newData[symbol];
+            return newData;
+        });
+    };
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(value || 0);
+    };
+
+    const formatPercent = (value) => {
+        const sign = value >= 0 ? '+' : '';
+        return `${sign}${(value || 0).toFixed(2)}%`;
+    };
+
+    const getMarketMovers = () => {
+        const stocks = Object.entries(stockData).map(([symbol, data]) => ({
+            symbol,
+            ...data
+        }));
+
+        const gainers = stocks
+            .filter(s => s.percentChange > 0)
+            .sort((a, b) => b.percentChange - a.percentChange)
+            .slice(0, 3);
+
+        const losers = stocks
+            .filter(s => s.percentChange < 0)
+            .sort((a, b) => a.percentChange - b.percentChange)
+            .slice(0, 3);
+
+        return { gainers, losers };
+    };
+
+    const { gainers, losers } = getMarketMovers();
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Live Prices</h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2">Real-time stock market data and charts</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                    <Button
-                        onClick={() => loadPopularStocks(true)}
-                        disabled={refreshing}
-                        variant="outline"
-                        size="sm"
-                    >
-                        <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                        {refreshing ? 'Refreshing...' : 'Refresh'}
-                    </Button>
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Auto-refresh</span>
-                        <button
-                            onClick={() => setAutoRefresh(!autoRefresh)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                autoRefresh ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'
-                            }`}
-                        >
-                            <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    autoRefresh ? 'translate-x-6' : 'translate-x-1'
-                                }`}
-                            />
-                        </button>
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                    Live Market Data
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                    Real-time stock prices powered by Finnhub API
+                </p>
+            </div>
+
+            {/* Controls */}
+            <Card className="p-6 mb-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div className="flex gap-2 flex-1 w-full sm:w-auto">
+                        <input
+                            type="text"
+                            value={newSymbol}
+                            onChange={(e) => setNewSymbol(e.target.value.toUpperCase())}
+                            onKeyPress={(e) => e.key === 'Enter' && addStock()}
+                            placeholder="Add stock symbol (e.g., NVDA)"
+                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        />
+                        <Button onClick={addStock} className="flex items-center gap-2">
+                            <Plus className="w-4 h-4" />
+                            Add
+                        </Button>
                     </div>
-                    <QuickActions />
+
+                    <div className="flex gap-2">
+                        <Button
+                            onClick={fetchAllStockData}
+                            variant="outline"
+                            className="flex items-center gap-2"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                            Refresh All
+                        </Button>
+
+                        <Button
+                            onClick={() => setAutoRefresh(!autoRefresh)}
+                            variant={autoRefresh ? "primary" : "outline"}
+                            className="flex items-center gap-2"
+                        >
+                            <Activity className="w-4 h-4" />
+                            Auto {autoRefresh ? 'ON' : 'OFF'}
+                        </Button>
+                    </div>
                 </div>
+            </Card>
+
+            {/* Market Movers */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Top Gainers */}
+                <Card className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+                        Top Gainers
+                    </h3>
+                    <div className="space-y-3">
+                        {gainers.length > 0 ? gainers.map((stock) => (
+                            <div key={stock.symbol} className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                <div>
+                                    <p className="font-semibold text-gray-900 dark:text-gray-100">{stock.symbol}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(stock.currentPrice)}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-semibold text-green-600 dark:text-green-400">{formatPercent(stock.percentChange)}</p>
+                                    <p className="text-sm text-green-600 dark:text-green-400">+{formatCurrency(stock.change)}</p>
+                                </div>
+                            </div>
+                        )) : (
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">No gainers yet</p>
+                        )}
+                    </div>
+                </Card>
+
+                {/* Top Losers */}
+                <Card className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <TrendingDown className="w-5 h-5 mr-2 text-red-600" />
+                        Top Losers
+                    </h3>
+                    <div className="space-y-3">
+                        {losers.length > 0 ? losers.map((stock) => (
+                            <div key={stock.symbol} className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                <div>
+                                    <p className="font-semibold text-gray-900 dark:text-gray-100">{stock.symbol}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(stock.currentPrice)}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-semibold text-red-600 dark:text-red-400">{formatPercent(stock.percentChange)}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-400">{formatCurrency(stock.change)}</p>
+                                </div>
+                            </div>
+                        )) : (
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">No losers yet</p>
+                        )}
+                    </div>
+                </Card>
             </div>
 
             {error && (
-                <Card className="mb-6 p-4 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
-                    <p className="text-red-600 dark:text-red-400">{error}</p>
+                <Card className="p-4 mb-6 border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
+                    <p className="text-red-800 dark:text-red-300">{error}</p>
                 </Card>
             )}
 
-            {/* Search */}
-            <Card className="mb-6 p-6">
-                <div className="flex space-x-4">
-                    <Input
-                        type="text"
-                        placeholder="Search stocks by symbol or company name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                        className="flex-1"
-                    />
-                    <Button onClick={handleSearch} disabled={searching}>
-                        <Search className="w-4 h-4 mr-2" />
-                        {searching ? 'Searching...' : 'Search'}
-                    </Button>
-                </div>
+            {/* Stock Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {watchedStocks.map((symbol) => {
+                    const data = stockData[symbol];
+                    const isPositive = data?.change >= 0;
+                    const history = priceHistory[symbol] || [];
 
-                {/* Search Results */}
-                {searchResults.length > 0 && (
-                    <div className="mt-4 max-h-60 overflow-y-auto">
-                        {searchResults.map((stock, index) => (
-                            <div
-                                key={index}
-                                onClick={() => handleStockSelect(stock)}
-                                className="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer rounded-lg border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                    return (
+                        <Card key={symbol} className="p-6 relative">
+                            {/* Remove Button */}
+                            <button
+                                onClick={() => removeStock(symbol)}
+                                className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                title="Remove stock"
                             >
-                                <div>
-                                    <div className="font-semibold text-gray-900 dark:text-gray-100">{stock.symbol}</div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400">{stock.name}</div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">{stock.type}</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">{stock.region}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </Card>
+                                <X className="w-4 h-4 text-gray-500" />
+                            </button>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Stock List */}
-                <div className="lg:col-span-1">
-                    <Card className="p-6 h-full">
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                            <Activity className="w-5 h-5 mr-2" />
-                            Popular Stocks
-                        </h2>
-                        <div className="space-y-2 max-h-96 overflow-y-auto">
-                            {popularStocks.map((stock, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handleStockSelect(stock)}
-                                    className={`p-4 rounded-lg cursor-pointer transition-all ${
-                                        selectedStock?.symbol === stock.symbol
-                                            ? 'bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700'
-                                            : 'hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
-                                    }`}
-                                >
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {stock.symbol}
-                                            </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                Vol: {stock.volume?.toLocaleString() || 'N/A'}
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {formatPrice(stock.price)}
-                                            </div>
-                                            <div className={`text-sm flex items-center ${
-                                                parseFloat(stock.change) >= 0
-                                                    ? 'text-green-600 dark:text-green-400'
-                                                    : 'text-red-600 dark:text-red-400'
-                                            }`}>
-                                                {parseFloat(stock.change) >= 0 ?
-                                                    <TrendingUp className="w-3 h-3 mr-1" /> :
-                                                    <TrendingDown className="w-3 h-3 mr-1" />
-                                                }
-                                                {formatPercent(stock.changePercent)}
-                                            </div>
-                                        </div>
+                            {loading[symbol] && !data ? (
+                                <div className="animate-pulse">
+                                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+                                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
+                                    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                </div>
+                            ) : data ? (
+                                <>
+                                    {/* Header */}
+                                    <div className="mb-4">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                            {symbol}
+                                        </h3>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
-                </div>
 
-                {/* Chart Section */}
-                <div className="lg:col-span-2">
-                    {selectedStock ? (
-                        <Card className="p-6 h-full">
-                            {/* Stock Header */}
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                        {selectedStock.symbol}
-                                    </h2>
-                                    <div className="flex items-center mt-2 space-x-4">
-                                        <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                            {formatPrice(selectedStock.price)}
-                                        </span>
-                                        <div className={`flex items-center text-lg ${
-                                            parseFloat(selectedStock.change) >= 0
+                                    {/* Price Info */}
+                                    <div className="mb-4">
+                                        <div className="flex items-baseline gap-3 mb-2">
+                                            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                                                {formatCurrency(data.currentPrice)}
+                                            </p>
+                                            <div className={`flex items-center gap-1 px-2 py-1 rounded text-sm font-semibold ${
+                                                isPositive
+                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                            }`}>
+                                                {isPositive ? (
+                                                    <TrendingUp className="w-4 h-4" />
+                                                ) : (
+                                                    <TrendingDown className="w-4 h-4" />
+                                                )}
+                                                <span>{formatPercent(data.percentChange)}</span>
+                                            </div>
+                                        </div>
+                                        <p className={`text-sm ${
+                                            isPositive
                                                 ? 'text-green-600 dark:text-green-400'
                                                 : 'text-red-600 dark:text-red-400'
                                         }`}>
-                                            {parseFloat(selectedStock.change) >= 0 ?
-                                                <TrendingUp className="w-5 h-5 mr-1" /> :
-                                                <TrendingDown className="w-5 h-5 mr-1" />
-                                            }
-                                            {formatPrice(selectedStock.change)} ({formatPercent(selectedStock.changePercent)})
+                                            {data.change >= 0 ? '+' : ''}{formatCurrency(data.change)} today
+                                        </p>
+                                    </div>
+
+                                    {/* Chart */}
+                                    {history.length > 0 && (
+                                        <div className="mb-4" style={{ height: '150px' }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={history}>
+                                                    <defs>
+                                                        <linearGradient id={`gradient-${symbol}`} x1="0" y1="0" x2="0" y2="1">
+                                                            <stop
+                                                                offset="5%"
+                                                                stopColor={isPositive ? '#10b981' : '#ef4444'}
+                                                                stopOpacity={0.3}
+                                                            />
+                                                            <stop
+                                                                offset="95%"
+                                                                stopColor={isPositive ? '#10b981' : '#ef4444'}
+                                                                stopOpacity={0}
+                                                            />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+                                                    <XAxis
+                                                        dataKey="time"
+                                                        tick={{ fontSize: 10 }}
+                                                        interval="preserveStartEnd"
+                                                        stroke="#6b7280"
+                                                    />
+                                                    <YAxis
+                                                        domain={['auto', 'auto']}
+                                                        tick={{ fontSize: 10 }}
+                                                        stroke="#6b7280"
+                                                    />
+                                                    <Tooltip
+                                                        contentStyle={{
+                                                            backgroundColor: '#1f2937',
+                                                            border: 'none',
+                                                            borderRadius: '8px',
+                                                            color: '#fff'
+                                                        }}
+                                                        formatter={(value) => [formatCurrency(value), 'Price']}
+                                                    />
+                                                    <Area
+                                                        type="monotone"
+                                                        dataKey="price"
+                                                        stroke={isPositive ? '#10b981' : '#ef4444'}
+                                                        strokeWidth={2}
+                                                        fill={`url(#gradient-${symbol})`}
+                                                    />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    )}
+
+                                    {/* Stats Grid */}
+                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Open</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.open)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">High</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.high)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Low</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.low)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Prev Close</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{formatCurrency(data.previousClose)}</p>
                                         </div>
                                     </div>
 
-                                    {/* Additional Info */}
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-                                        <div>
-                                            <span className="text-gray-500 dark:text-gray-400">Open</span>
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {formatPrice(selectedStock.open)}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-500 dark:text-gray-400">High</span>
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {formatPrice(selectedStock.high)}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-500 dark:text-gray-400">Low</span>
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {formatPrice(selectedStock.low)}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-500 dark:text-gray-400">Volume</span>
-                                            <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                {selectedStock.volume?.toLocaleString() || 'N/A'}
-                                            </div>
-                                        </div>
+                                    {/* Last Updated */}
+                                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            Last updated: {new Date(data.timestamp * 1000).toLocaleString()}
+                                        </p>
                                     </div>
-                                </div>
-
-                                {/* Period Selector */}
-                                <div className="flex space-x-2">
+                                </>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-500 dark:text-gray-400">Failed to load data</p>
                                     <Button
-                                        size="sm"
-                                        variant={chartPeriod === 'intraday' ? 'primary' : 'outline'}
-                                        onClick={() => setChartPeriod('intraday')}
+                                        onClick={() => fetchStockData(symbol)}
+                                        variant="outline"
+                                        className="mt-4"
                                     >
-                                        1D
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant={chartPeriod === 'daily' ? 'primary' : 'outline'}
-                                        onClick={() => setChartPeriod('daily')}
-                                    >
-                                        1M
+                                        Retry
                                     </Button>
                                 </div>
-                            </div>
-
-                            {/* Chart */}
-                            <div className="h-96">
-                                {loadingChart ? (
-                                    <div className="flex items-center justify-center h-full">
-                                        <Loading />
-                                    </div>
-                                ) : historicalData && historicalData.data ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={formatChartData(historicalData)}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                            <XAxis
-                                                dataKey="name"
-                                                stroke="#6b7280"
-                                                fontSize={12}
-                                            />
-                                            <YAxis
-                                                stroke="#6b7280"
-                                                fontSize={12}
-                                                domain={['dataMin - 5', 'dataMax + 5']}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                                    border: '1px solid #e5e7eb',
-                                                    borderRadius: '6px',
-                                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                                                }}
-                                                formatter={(value, name) => [formatPrice(value), name === 'price' ? 'Price' : name]}
-                                            />
-                                            <Area
-                                                type="monotone"
-                                                dataKey="price"
-                                                stroke="#3b82f6"
-                                                strokeWidth={2}
-                                                fill="rgba(59, 130, 246, 0.1)"
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                                        No chart data available
-                                    </div>
-                                )}
-                            </div>
+                            )}
                         </Card>
-                    ) : (
-                        <Card className="p-6 h-full flex items-center justify-center">
-                            <div className="text-center text-gray-500 dark:text-gray-400">
-                                <Eye className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                                <p>Select a stock to view its chart</p>
-                            </div>
-                        </Card>
-                    )}
-                </div>
+                    );
+                })}
             </div>
+
+            {watchedStocks.length === 0 && (
+                <Card className="p-12 text-center">
+                    <Activity className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                        No stocks in your watchlist
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        Add some stock symbols above to start tracking live prices
+                    </p>
+                </Card>
+            )}
         </div>
     );
 };
