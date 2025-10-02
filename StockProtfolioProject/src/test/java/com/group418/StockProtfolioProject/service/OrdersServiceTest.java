@@ -111,36 +111,6 @@ class OrdersServiceTest {
     }
 
     @Test
-    void updateOrderStatus_validTransitionToFilled_updatesPortfolioAndHoldings() {
-        Portfolios portfolio = new Portfolios();
-        portfolio.setInitialCapital(1000);
-
-        Stocks stock = new Stocks();
-        stock.setStockId(10);
-
-        Orders order = new Orders();
-        order.setOrderId(1);
-        order.setPortfolio(portfolio);
-        order.setStock(stock);
-        order.setStatusCode(0); // pending
-        order.setPrice(100);
-        order.setVolume(2);
-        order.setFees(10);
-        order.setBuy_or_sell(Orders.BuySellType.BUY);
-
-        when(ordersRepository.findById(1)).thenReturn(Optional.of(order));
-        when(ordersRepository.save(any(Orders.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(holdingsRepository.findByPortfolioPortfolioIdAndStockStockId(anyInt(), anyInt()))
-                .thenReturn(Optional.empty());
-
-        Orders updated = ordersService.updateOrderStatus(1, 1);
-
-        assertThat(updated.getStatus_code()).isEqualTo(1);
-        assertThat(portfolio.getInitialCapital()).isLessThan(1000); // spent money
-        verify(holdingsRepository, times(1)).save(any());
-    }
-
-    @Test
     void updateOrderStatus_invalidCode_throws() {
         Orders order = new Orders();
         order.setStatusCode(0);

@@ -3,6 +3,7 @@ package com.group418.StockProtfolioProject.service;
 import com.group418.StockProtfolioProject.entity.Holdings;
 import com.group418.StockProtfolioProject.entity.Orders;
 import com.group418.StockProtfolioProject.entity.Portfolios;
+import com.group418.StockProtfolioProject.entity.Portfolios.PortfolioStatus;
 import com.group418.StockProtfolioProject.entity.PriceHistory;
 import com.group418.StockProtfolioProject.exception.ResourceNotFoundException;
 import com.group418.StockProtfolioProject.repository.HoldingsRepository;
@@ -10,6 +11,7 @@ import com.group418.StockProtfolioProject.repository.OrdersRepository;
 import com.group418.StockProtfolioProject.repository.PortfolioRepository;
 import com.group418.StockProtfolioProject.repository.PriceHistoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -266,6 +268,8 @@ public class PortfolioService {
                 summary.put("availableCapital", portfolio.getInitialCapital());
                 summary.put("totalCapital", totalValue + portfolio.getInitialCapital());
                 summary.put("holdingsCount", holdings.size());
+                // Add status so frontend can filter out CLOSED portfolios
+                summary.put("status", portfolio.getStatus());
                 
                 return summary;
             })
@@ -275,4 +279,52 @@ public class PortfolioService {
     public List<Holdings> getPortfolioHoldings(Integer portfolioId) {
         return holdingsRepository.findByPortfolioPortfolioId(portfolioId);
     }
+
+    @Transactional
+    public Portfolios closePortfolio(Integer id, boolean liquidate) {
+    Portfolios portfolio = getPortfolioById(id);
+
+    // Check for pending orders
+    List<Orders> orders = ordersRepository.findByPortfoliosPortfolioId(id);
+    boolean hasPendingOrders = orders.stream().anyMatch(order -> order.getStatus_code() != 2);
+    if (hasPendingOrders) {
+        throw new IllegalArgumentException("Cannot close portfolio. Some orders are still processing.");
+    }
+
+    if (liquidate) {
+        List<Holdings> holdings = holdingsRepository.findByPortfolioPortfolioId(id);
+        for (Holdings h : holdings) {
+            if (h == null || h.getQuantity() <= 0) continue;
+
+            Orders sellOrder = new Orders();
+            sellOrder.setPortfolio(portfolio);
+            sellOrder.setStock(h.getStock());
+            sellOrder.setBuy_or_sell(Orders.BuySellType.SELL);
+            sellOrder.setOrder_type(Orders.OrderType.Market);
+            sellOrder.setVolume(h.getQuantity());
+
+            double price = priceHistoryRepository.findByStockStockIdOrderByCreatedAtDesc(h.getStock().getStockId())
+                            .stream()
+                            .findFirst()
+                            .map(p -> p.getPrice())
+                            .orElse(0.0);
+
+            sellOrder.setPrice(price);
+            sellOrder.setFees(0.0);
+            sellOrder.setStatus_code(2); // Mark as filled
+            sellOrder.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            ordersRepository.save(sellOrder);
+
+            holdingsRepository.delete(h);
+        }
+    } else {
+        if (!holdingsRepository.findByPortfolioPortfolioId(id).isEmpty()) {
+            throw new IllegalArgumentException("Portfolio has active holdings. Liquidation is required to close.");
+        }
+    }
+
+    portfolio.setStatus(PortfolioStatus.CLOSED); // Mark portfolio as closed
+    return portfolioRepository.save(portfolio);
+}
+
 }

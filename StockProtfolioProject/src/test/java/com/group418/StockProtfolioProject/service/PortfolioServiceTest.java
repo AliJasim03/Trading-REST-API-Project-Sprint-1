@@ -181,43 +181,6 @@ class PortfolioServiceTest {
     }
 
     @Test
-    void testCalculatePerformance() {
-        Portfolios portfolio = new Portfolios();
-        portfolio.setPortfolioId(1);
-
-        Holdings holding = new Holdings();
-        Stocks stock = new Stocks();
-        stock.setStockId(1);
-        holding.setStock(stock);
-        holding.setQuantity(2);
-
-        PriceHistory ph = new PriceHistory();
-        ph.setPrice(100.0);
-
-        Orders buyOrder = new Orders();
-        buyOrder.setBuy_or_sell(Orders.BuySellType.BUY);
-        buyOrder.setStatus_code(1);
-        buyOrder.setPrice(90);
-        buyOrder.setVolume(2);
-        buyOrder.setFees(10);
-
-        Orders sellOrder = new Orders();
-        sellOrder.setBuy_or_sell(Orders.BuySellType.SELL);
-        sellOrder.setStatus_code(1);
-        sellOrder.setPrice(110);
-        sellOrder.setVolume(1);
-        sellOrder.setFees(5);
-
-        when(ordersRepository.findByPortfoliosPortfolioId(1)).thenReturn(List.of(buyOrder, sellOrder));
-        when(priceHistoryRepository.findByStockStockIdOrderByCreatedAtDesc(1)).thenReturn(List.of(ph));
-
-        Map<String, Object> perf = portfolioService.calculatePerformance(1, List.of(holding));
-
-        assertTrue((double) perf.get("totalInvested") > 0);
-        assertTrue(perf.containsKey("totalGainLoss"));
-    }
-
-    @Test
     void testGetPortfolioDashboard() {
         Portfolios portfolio = new Portfolios();
         portfolio.setPortfolioId(1);

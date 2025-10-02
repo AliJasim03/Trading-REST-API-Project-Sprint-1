@@ -112,8 +112,32 @@ public class PortfolioController {
 
     @GetMapping("/{id}/holdings")
     public ResponseEntity<List<Holdings>> getPortfolioHoldings(@PathVariable Integer id) {
-    List<Holdings> holdings = portfolioService.getPortfolioHoldings(id);
-    return ResponseEntity.ok(holdings);
-}
+        List<Holdings> holdings = portfolioService.getPortfolioHoldings(id);
+        return ResponseEntity.ok(holdings);
+    }
 
+    @PostMapping("/{id}/close")
+    public ResponseEntity<?> closePortfolio(@PathVariable Integer id, @RequestBody(required = false) Map<String, Object> body) {
+        try {
+            boolean liquidate = false;
+            if (body != null && body.containsKey("liquidate")) {
+                Object v = body.get("liquidate");
+                if (v instanceof Boolean) {
+                    liquidate = (Boolean) v;
+                }
+            }
+            Portfolios closed = portfolioService.closePortfolio(id, liquidate);
+            return ResponseEntity.ok(closed);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Validation Error");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Server Error");
+            errorResponse.put("message", "An unexpected error occurred while closing the portfolio");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }

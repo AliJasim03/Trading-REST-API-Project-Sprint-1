@@ -40,11 +40,13 @@ class WatchlistAlertSchedulerTest {
         entry.setAlertDirection(AlertDirection.ABOVE);
         entry.setNotified(false);
 
-        when(watchlistRepository.findByNotifiedFalse()).thenReturn(List.of(entry));
+        // Use the same repository method that the scheduler uses
+        when(watchlistRepository.findByTargetPriceIsNotNullAndAlertDirectionIsNotNull()).thenReturn(List.of(entry));
         when(livePriceService.getCurrentPrice("AAPL")).thenReturn(Map.of("price", BigDecimal.valueOf(150)));
 
         scheduler.checkAlerts();
 
+        verify(notificationService).notifyPriceAlert(eq(entry), eq(BigDecimal.valueOf(150)));
         verify(watchlistRepository).save(entry);
         assertTrue(entry.getNotified());
     }

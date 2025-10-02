@@ -17,13 +17,14 @@ public class Portfolios {
     private String description;
     private enum portfolioType {Personal, Retirement, Speculative};
     private enum riskProfile {Low, Medium, High};
+    public enum PortfolioStatus { ACTIVE, CLOSED }
+    @Enumerated(EnumType.STRING)
+    @Column(name="status", nullable=false)
+    private PortfolioStatus status = PortfolioStatus.ACTIVE;
     @Column(name ="initial_capital")
     private double initialCapital;
     @Column(name ="created_at")
     private Timestamp createdAt;
-    /*@OneToMany(mappedBy = "portfolios")
-    @JsonManagedReference
-    private List<Orders> orders;*/
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Holdings> holdings;
@@ -84,5 +85,11 @@ public class Portfolios {
     
     public void setHoldings(List<Holdings> holdings) {
         this.holdings = holdings;
+    }
+    public PortfolioStatus getStatus() {
+        return status;
+    }
+    public void setStatus(PortfolioStatus status) {
+        this.status = status;
     }
 }

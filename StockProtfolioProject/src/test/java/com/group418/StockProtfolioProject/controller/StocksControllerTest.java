@@ -4,6 +4,7 @@ import com.group418.StockProtfolioProject.entity.PriceHistory;
 import com.group418.StockProtfolioProject.entity.Stocks;
 import com.group418.StockProtfolioProject.service.PriceHistoryService;
 import com.group418.StockProtfolioProject.service.StocksService;
+import com.group418.StockProtfolioProject.service.FinnhubService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,6 +31,9 @@ class StocksControllerTest {
 
     @MockBean
     private PriceHistoryService priceHistoryService;
+
+    @MockBean
+    private FinnhubService finnhubService;
 
     @Test
     void testGetAllStocks() throws Exception {
