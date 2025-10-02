@@ -11,6 +11,12 @@ import PortfolioSummary from '../components/dashboard/PortfolioSummary';
 import PortfolioPerformanceStats from '../components/dashboard/PortfolioPerformanceStats';
 import QuickActions from '../components/ui/QuickActions';
 
+// Import Chart Components
+import PortfolioAllocationChart from '../components/charts/PortfolioAllocationChart';
+import PerformanceTrendChart from '../components/charts/PerformanceTrendChart';
+import OrderStatusChart from '../components/charts/OrderStatusChart';
+import PortfolioComparisonChart from '../components/charts/PortfolioComparisonChart';
+
 const Dashboard = () => {
     const [stats, setStats] = useState({
         totalPortfolios: 0,
@@ -38,6 +44,7 @@ const Dashboard = () => {
         try {
             // Get portfolio summary from new API
             const summary = await apiService.getPortfolioSummary();
+            console.log('Portfolio Summary:', summary);
             setPortfolioSummary(summary);
 
             // Calculate totals
@@ -139,10 +146,31 @@ const Dashboard = () => {
             <PortfolioPerformanceStats stats={stats} totalStats={totalStats} loading={loading} />
 
             {/* Order Stats Grid */}
-            <OrderPerformanceStats stats={stats} loading={loading} />
+            {/* <OrderPerformanceStats stats={stats} loading={loading} /> */}
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Portfolio Allocation Chart */}
+                <PortfolioAllocationChart portfolioSummary={portfolioSummary || []} />
+                
+                {/* Order Status Chart */}
+                <OrderStatusChart stats={stats} />
+            </div>
+
+            {/* Performance Trend Chart - Full Width */}
+            {/* <div className="mb-8">
+                <PerformanceTrendChart totalStats={totalStats} portfolioSummary={portfolioSummary} />
+            </div> */}
+
+            {/* Portfolio Comparison Chart - Full Width */}
+            {portfolioSummary && portfolioSummary.length > 1 && (
+                <div className="mb-8">
+                    <PortfolioComparisonChart portfolioSummary={portfolioSummary} />
+                </div>
+            )}
 
             {/* Portfolio Summary */}
-            {portfolioSummary.length > 0 && (
+            {portfolioSummary && portfolioSummary.length > 0 && (
                 <PortfolioSummary portfolioSummary={portfolioSummary} />
             )}
         </div>
