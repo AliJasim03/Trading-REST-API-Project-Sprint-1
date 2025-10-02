@@ -1,5 +1,6 @@
 package com.group418.StockProtfolioProject.controller;
 
+import com.group418.StockProtfolioProject.entity.Holdings;
 import com.group418.StockProtfolioProject.entity.Portfolios;
 import com.group418.StockProtfolioProject.service.PortfolioService;
 import org.springframework.http.HttpStatus;
@@ -108,4 +109,11 @@ public class PortfolioController {
         List<Map<String, Object>> allocation = portfolioService.calculateAllocation(holdings);
         return ResponseEntity.ok(allocation);
     }
+
+    @GetMapping("/{id}/holdings")
+    public ResponseEntity<List<Holdings>> getPortfolioHoldings(@PathVariable Integer id) {
+    List<Holdings> holdings = portfolioService.getPortfolioHoldings(id);
+    return ResponseEntity.ok(holdings);
+}
+
 }

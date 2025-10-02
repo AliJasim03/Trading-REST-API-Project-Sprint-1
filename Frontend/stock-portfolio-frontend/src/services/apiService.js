@@ -118,6 +118,16 @@ const apiService = {
         }
     },
 
+    // ADD: holdings under apiService (used by PlaceOrderDialog)
+    getPortfolioHoldings: async (portfolioId) => {
+        try {
+            const response = await apiClient.get(`/portfolios/${portfolioId}/holdings`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     createPortfolio: async (portfolioData) => {
         try {
             const response = await apiClient.post('/portfolios/create', portfolioData);
@@ -176,8 +186,10 @@ const apiService = {
     // Stocks API
     getAllStocks: async () => {
         try {
-            const response = await apiClient.get('/stocks');
-            return response.data;
+            // Ask for many records; if backend paginates, unwrap content
+            const response = await apiClient.get('/stocks', { params: { page: 0, size: 1000, limit: 1000 } });
+            const data = response.data;
+            return Array.isArray(data) ? data : (data?.content || []);
         } catch (error) {
             throw error;
         }

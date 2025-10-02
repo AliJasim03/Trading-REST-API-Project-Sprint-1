@@ -6,6 +6,7 @@ const HoldingsAllocation = ({ holdingsAllocation, loading }) => {
     if (loading) {
         return (
             <Card className="p-6">
+                
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Holdings Allocation</h3>
                 </div>

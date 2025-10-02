@@ -37,6 +37,7 @@ class OrdersServiceTest {
         portfolioRepository = mock(PortfolioRepository.class);
         stocksRepository = mock(StocksRepository.class);
         holdingsRepository = mock(HoldingsRepository.class);
+        notificationService = mock(NotificationService.class);
         ordersService = new OrdersService(ordersRepository, stocksRepository, portfolioRepository, holdingsRepository, notificationService);
     }
 
