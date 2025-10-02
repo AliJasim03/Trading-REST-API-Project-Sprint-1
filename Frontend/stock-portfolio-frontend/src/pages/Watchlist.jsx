@@ -10,6 +10,7 @@ import ViewAlertsDialog from '../components/dialog/ViewAlertsDialog';
 import { watchlistService } from '../services/apiService';
 import { useNotificationContext } from '../context/NotificationContext';
 import { Bell, Plus, AlertTriangle, RotateCcw } from 'lucide-react';
+import QuickActions from '../components/ui/QuickActions';
 
 const Watchlist = () => {
     const [watchlistData, setWatchlistData] = useState([]);
@@ -149,14 +150,14 @@ const Watchlist = () => {
                         </div>
                     </div>
                     <div className="flex items-center space-x-3">
+                        <QuickActions />
                         <Button
                             onClick={handleRefresh}
                             variant="outline"
                             disabled={refreshing}
                             className="flex items-center"
                         >
-                            <RotateCcw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                            Refresh
+                            <RotateCcw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
                         </Button>
                     </div>
                 </div>
