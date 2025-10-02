@@ -16,12 +16,30 @@ const CreatePortfolioDialog = ({ isOpen, onClose, onPortfolioCreated }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    // NEW: cache existing portfolio names (normalized)
+    const [existingNames, setExistingNames] = useState([]);
 
     // Reset form when dialog closes
     React.useEffect(() => {
         if (!isOpen) {
             resetForm();
         }
+    }, [isOpen]);
+
+    // NEW: fetch existing portfolio names when dialog opens
+    React.useEffect(() => {
+        if (!isOpen) return;
+        apiService.getAllPortfolios()
+            .then(list => {
+                const names = (list || [])
+                    .map(p => (p?.portfolioName || '').trim().toLowerCase())
+                    .filter(Boolean);
+                setExistingNames(names);
+            })
+            .catch(() => {
+                // ignore; uniqueness validation will be skipped if we cannot load
+                setExistingNames([]);
+            });
     }, [isOpen]);
 
     const handleInputChange = (e) => {
@@ -47,6 +65,11 @@ const CreatePortfolioDialog = ({ isOpen, onClose, onPortfolioCreated }) => {
             errors.portfolioName = 'Portfolio name is required';
         } else if (portfolioData.portfolioName.trim().length < 2) {
             errors.portfolioName = 'Portfolio name must be at least 2 characters long';
+        }
+        // NEW: uniqueness check (case-insensitive)
+        const normalizedName = portfolioData.portfolioName.trim().toLowerCase();
+        if (!errors.portfolioName && existingNames.includes(normalizedName)) {
+            errors.portfolioName = 'A portfolio with this name already exists';
         }
 
         if (!portfolioData.description.trim()) {

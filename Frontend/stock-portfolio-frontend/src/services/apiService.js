@@ -103,6 +103,20 @@ const apiService = {
     getAllPortfolios: async () => {
         try {
             const response = await apiClient.get('/portfolios');
+            const data = response.data;
+            // Exclude CLOSED portfolios for selection/dropdowns
+            return Array.isArray(data)
+                ? data.filter(p => String(p?.status || '').toUpperCase() !== 'CLOSED')
+                : data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // NEW: include CLOSED portfolios (used by Portfolios page)
+    getAllPortfoliosIncludingClosed: async () => {
+        try {
+            const response = await apiClient.get('/portfolios');
             return response.data;
         } catch (error) {
             throw error;
@@ -112,16 +126,6 @@ const apiService = {
     getPortfolioById: async (portfolioId) => {
         try {
             const response = await apiClient.get(`/portfolios/${portfolioId}`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    // ADD: holdings under apiService (used by PlaceOrderDialog)
-    getPortfolioHoldings: async (portfolioId) => {
-        try {
-            const response = await apiClient.get(`/portfolios/${portfolioId}/holdings`);
             return response.data;
         } catch (error) {
             throw error;
@@ -140,6 +144,15 @@ const apiService = {
     updatePortfolio: async (portfolioId, portfolioData) => {
         try {
             const response = await apiClient.put(`/portfolios/${portfolioId}`, portfolioData);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    closePortfolio: async (portfolioId, { liquidate = true } = {}) => {
+        try {
+            const response = await apiClient.post(`/portfolios/${portfolioId}/close`, { liquidate });
             return response.data;
         } catch (error) {
             throw error;
@@ -186,10 +199,8 @@ const apiService = {
     // Stocks API
     getAllStocks: async () => {
         try {
-            // Ask for many records; if backend paginates, unwrap content
-            const response = await apiClient.get('/stocks', { params: { page: 0, size: 1000, limit: 1000 } });
-            const data = response.data;
-            return Array.isArray(data) ? data : (data?.content || []);
+            const response = await apiClient.get('/stocks');
+            return response.data;
         } catch (error) {
             throw error;
         }
@@ -236,34 +247,6 @@ const apiService = {
     getPriceHistory: async (stockId) => {
         try {
             const response = await apiClient.get(`/stocks/${stockId}/price-history`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    // Finnhub Live Prices API (NEW)
-    getLivePrice: async (stockId) => {
-        try {
-            const response = await apiClient.get(`/stocks/${stockId}/live-price`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    getLivePriceBySymbol: async (symbol) => {
-        try {
-            const response = await apiClient.get(`/stocks/ticker/${symbol}/live-price`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    getCompanyProfile: async (symbol) => {
-        try {
-            const response = await apiClient.get(`/stocks/ticker/${symbol}/profile`);
             return response.data;
         } catch (error) {
             throw error;
@@ -407,4 +390,4 @@ const watchlistService = {
 
 // Export both services
 export default apiService;
-export {livePriceService as livePrices, watchlistService};
+export { livePriceService as livePrices, watchlistService };

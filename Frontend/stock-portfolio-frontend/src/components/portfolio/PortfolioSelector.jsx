@@ -40,6 +40,10 @@ const PortfolioSelector = ({
             onRefresh();
         }
     };
+
+    // REMOVE filtering; show CLOSED too
+    const allPortfolios = portfolios || [];
+
     if (loading) {
         return (
             <Card className="p-6 mb-8">
@@ -76,17 +80,27 @@ const PortfolioSelector = ({
           <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Select Portfolio</h2>
               <div className="flex space-x-2">
-                <button 
-                  onClick={() => setIsUpdateDialogOpen(true)} 
-                  className={`p-3 rounded-lg transition-all hover:scale-105 active:scale-95 ${
-                    selectedPortfolio 
-                      ? 'bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400' 
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  }`}
-                  title={selectedPortfolio ? "Edit Selected Portfolio" : "Select a portfolio to edit"}
-                  disabled={!selectedPortfolio}
+              <button
+                onClick={() => setIsUpdateDialogOpen(true)}
+                className={`p-3 rounded-lg transition-all hover:scale-105 active:scale-95 ${
+                    selectedPortfolio
+                    ? selectedPortfolio.status?.toUpperCase() === 'CLOSED'
+                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                        : 'bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:hover:bg-primary-800/50 text-primary-600 dark:text-primary-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                }`}
+                title={
+                    selectedPortfolio?.status?.toUpperCase() === 'CLOSED'
+                    ? "Closed portfolios cannot be edited"
+                    : selectedPortfolio
+                    ? "Edit Selected Portfolio"
+                    : "Select a portfolio to edit"
+                }
+                disabled={
+                    !selectedPortfolio || selectedPortfolio.status?.toUpperCase() === 'CLOSED'
+                }
                 >
-                  <Pencil className="w-5 h-5" />
+                <Pencil className="w-5 h-5" />
                 </button>
                 <button 
                     onClick={() => setIsCreateDialogOpen(true)} 
@@ -100,15 +114,15 @@ const PortfolioSelector = ({
           </div>
           
             
-            {portfolios.length === 0 ? (
+            {allPortfolios.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No portfolios found</h3>
                     <p className="text-sm">Create your first portfolio to get started.</p>
                 </div>
             ) : (
-                <div className={`grid grid-cols-1 md:grid-cols-2 ${portfolios.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
-                    {portfolios.map((portfolio) => (
+                <div className={`grid grid-cols-1 md:grid-cols-2 ${allPortfolios.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+                    {allPortfolios.map((portfolio) => (
                         <button
                             key={portfolio.portfolioId}
                             onClick={() => onPortfolioSelect(portfolio)}
@@ -119,8 +133,19 @@ const PortfolioSelector = ({
                             }`}
                         >
                             <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                                     {portfolio.portfolioName || portfolio.name}
+                                    {portfolio.status && (
+                                        <span
+                                            className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                                                String(portfolio.status).toUpperCase() === 'CLOSED'
+                                                    ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                                    : 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300'
+                                            }`}
+                                        >
+                                            {String(portfolio.status).toUpperCase()}
+                                        </span>
+                                    )}
                                 </h3>
                                 <Briefcase className={`w-5 h-5 ${
                                     selectedPortfolio?.portfolioId === portfolio.portfolioId

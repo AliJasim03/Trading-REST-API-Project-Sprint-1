@@ -139,6 +139,7 @@ CREATE TABLE `stocks` (
 LOCK TABLES `stocks` WRITE;
 /*!40000 ALTER TABLE `stocks` DISABLE KEYS */;
 INSERT INTO `stocks` VALUES (1,'AAPL','Apple Inc.','Technology','NASDAQ','USD','US0378331005','037833100','2025-09-19 08:38:37'),(2,'MSFT','Microsoft Corp.','Technology','NASDAQ','USD','US5949181045','594918104','2025-09-19 08:38:37'),(3,'AMZN','Amazon.com Inc.','Consumer Discretionary','NASDAQ','USD','US0231351067','023135106','2025-09-19 08:38:37'),(4,'TSLA','Tesla Inc.','Automotive','NASDAQ','USD','US88160R1014','88160R101','2025-09-19 08:38:37'),(5,'JPM','JPMorgan Chase & Co.','Financials','NYSE','USD','US46625H1005','46625H100','2025-09-19 08:38:37'),(6,'GOOGL','Alphabet Inc. Class A','Technology','NASDAQ','USD','US02079K3059','02079K305','2025-09-19 08:38:37'),(7,'XOM','Exxon Mobil Corp.','Energy','NYSE','USD','US30231G1022','30231G102','2025-09-19 08:38:37');
+                          
 /*!40000 ALTER TABLE `stocks` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

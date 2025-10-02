@@ -4,7 +4,7 @@ import { useAgGridTheme } from '../../context/ThemeContext'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PortfolioSummary({ portfolioSummary }) {
- const gridTheme = useAgGridTheme()
+  const gridTheme = useAgGridTheme()
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat('en-US', {
@@ -67,6 +67,17 @@ export default function PortfolioSummary({ portfolioSummary }) {
     []
   )
 
+  // Filter out closed portfolios (supports status at root or nested under 'portfolio')
+  const activePortfolios = useMemo(
+    () =>
+      (portfolioSummary || []).filter((p) => {
+        const status =
+          (p?.status ?? p?.portfolio?.status ?? '').toString().toUpperCase()
+        return status !== 'CLOSED'
+      }),
+    [portfolioSummary]
+  )
+
   return (
     <Card className="p-6 mb-8">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
@@ -76,18 +87,14 @@ export default function PortfolioSummary({ portfolioSummary }) {
       <div
         className={`${gridTheme} rounded-xl border border-gray-200 dark:border-gray-700`}
         style={{ width: '100%', height: '100%' }}
-        >
+      >
         <AgGridReact
-            rowData={portfolioSummary}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            animateRows={true}
-            theme="legacy"
-            domLayout="autoHeight"
-             pagination={true}
-            paginationPageSize={5}
-            paginationPageSizeSelector={[5, 10, 20]}
-
+          rowData={activePortfolios}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          animateRows={true}
+          theme="legacy"
+          domLayout="autoHeight"
         />
       </div>
     </Card>

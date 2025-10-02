@@ -30,7 +30,8 @@ const Portfolios = () => {
         try {
             setLoading(true);
             setError(null);
-            const portfoliosData = await apiService.getAllPortfolios();
+            // Include CLOSED portfolios on this page
+            const portfoliosData = await apiService.getAllPortfoliosIncludingClosed();
             setPortfolios(portfoliosData);
         } catch (error) {
             console.error('Error fetching portfolios:', error);

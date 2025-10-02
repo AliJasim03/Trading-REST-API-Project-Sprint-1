@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pencil, CheckCircle, X, Building } from 'lucide-react';
+import { Pencil, CheckCircle, X, Building, Trash2, AlertTriangle } from 'lucide-react';
 import Dialog from './Dialog';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -16,8 +16,10 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    const [existingNames, setExistingNames] = useState([]);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
-    // Initialize form data when portfolio changes or dialog opens
     useEffect(() => {
         if (isOpen && portfolio) {
             setPortfolioData({
@@ -31,12 +33,24 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
         }
     }, [isOpen, portfolio]);
 
-    // Reset form when dialog closes
     useEffect(() => {
         if (!isOpen) {
             resetForm();
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen || !portfolio) return;
+        apiService.getAllPortfolios()
+            .then(list => {
+                const names = (list || [])
+                    .filter(p => p?.portfolioId !== portfolio.portfolioId)
+                    .map(p => (p?.portfolioName || '').trim().toLowerCase())
+                    .filter(Boolean);
+                setExistingNames(names);
+            })
+            .catch(() => setExistingNames([]));
+    }, [isOpen, portfolio]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -45,7 +59,6 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
             [name]: value
         }));
 
-        // Clear validation error for this field
         if (validationErrors[name]) {
             setValidationErrors(prev => ({
                 ...prev,
@@ -58,21 +71,25 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
         const errors = {};
 
         if (!portfolioData.portfolioName.trim()) {
-            errors.portfolioName = 'Portfolio name is required';
+            errors.portfolioName = 'Portfolio name is required.';
         } else if (portfolioData.portfolioName.trim().length < 2) {
-            errors.portfolioName = 'Portfolio name must be at least 2 characters long';
+            errors.portfolioName = 'Portfolio name must be at least 2 characters long.';
+        }
+        const normalized = portfolioData.portfolioName.trim().toLowerCase();
+        if (!errors.portfolioName && existingNames.includes(normalized)) {
+            errors.portfolioName = 'A portfolio with this name already exists.';
         }
 
         if (!portfolioData.description.trim()) {
-            errors.description = 'Description is required';
+            errors.description = 'Description is required.';
         } else if (portfolioData.description.trim().length < 10) {
-            errors.description = 'Description must be at least 10 characters long';
+            errors.description = 'Description must be at least 10 characters long.';
         }
 
         if (!portfolioData.initialCapital || parseFloat(portfolioData.initialCapital) <= 0) {
-            errors.initialCapital = 'Please enter a valid initial capital amount greater than 0';
-        } else if (parseFloat(portfolioData.initialCapital) > 1000000) {
-            errors.initialCapital = 'Initial capital cannot exceed $1,000,000';
+            errors.initialCapital = 'Please enter a valid initial capital amount greater than 0.';
+        } else if (parseFloat(portfolioData.initialCapital) > 100000000) {
+            errors.initialCapital = 'Initial capital cannot exceed $100,000,000.';
         }
 
         setValidationErrors(errors);
@@ -101,12 +118,10 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
 
             setSuccess(`Portfolio "${portfolioData.portfolioName}" updated successfully!`);
 
-            // Call the callback to refresh the portfolio data
             if (onPortfolioUpdated) {
                 onPortfolioUpdated(result);
             }
 
-            // Close dialog after 1.5 seconds
             setTimeout(() => {
                 onClose();
             }, 1500);
@@ -117,6 +132,30 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
             setSubmitting(false);
         }
     };
+
+    const handleSellAllAndClose = async () => {
+        if (!portfolio) return;
+        setDeleting(true);
+        setError(null);
+        setSuccess(null);
+        try {
+          const result = await apiService.closePortfolio(portfolio.portfolioId, { liquidate: true });
+          if (onPortfolioUpdated) {
+            onPortfolioUpdated(result);
+          }
+          setIsDeleteDialogOpen(false);
+          onClose();
+        } catch (err) {
+          console.error('Failed to sell and close portfolio:', err);
+          const message =
+            err?.response?.data?.message ||
+            err.message ||
+            'Failed to sell and close portfolio. Please try again.';
+          setError(message);
+        } finally {
+          setDeleting(false);
+        }
+      };            
 
     const resetForm = () => {
         setPortfolioData({
@@ -232,7 +271,6 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
                         required
                     />
 
-                    {/* Portfolio Summary */}
                     {portfolioData.portfolioName && portfolioData.initialCapital && (
                         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div className="flex items-center mb-3">
@@ -258,8 +296,19 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
                         </div>
                     )}
 
-                    {/* Action Buttons */}
-                    <div className="flex justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
+                        
+
+                    <div className="flex items-center space-x-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsDeleteDialogOpen(true)}
+                            disabled={submitting || deleting}
+                            className="flex items-center px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white border border-red-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Close Portfolio
+                        </button>
+
                         <Button 
                             type="button" 
                             variant="outline" 
@@ -269,31 +318,82 @@ const UpdatePortfolioDialog = ({ isOpen, onClose, portfolio, onPortfolioUpdated 
                             Reset
                         </Button>
 
-                        <div className="flex space-x-3">
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={onClose}
-                                disabled={submitting}
-                            >
-                                Cancel
-                            </Button>
-                            <Button 
-                                type="submit" 
-                                disabled={submitting}
-                                className="flex items-center"
-                            >
-                                {submitting ? (
-                                    <Loading size="sm" className="mr-2" />
-                                ) : (
-                                    <Pencil className="w-4 h-4 mr-2" />
-                                )}
-                                {submitting ? 'Updating Portfolio...' : 'Update Portfolio'}
-                            </Button>
+                        <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={onClose}
+                            disabled={submitting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            type="submit" 
+                            disabled={submitting}
+                            className="flex items-center"
+                        >
+                            {submitting ? (
+                                <Loading size="sm" className="mr-2" />
+                            ) : (
+                                <Pencil className="w-4 h-4 mr-2" />
+                            )}
+                            {submitting ? 'Updating Portfolio...' : 'Update Portfolio'}
+                        </Button>
+                    </div>
+            </form>
+        </div>
+
+            <Dialog
+                isOpen={isDeleteDialogOpen}
+                onClose={() => (!deleting ? setIsDeleteDialogOpen(false) : null)}
+                title="Close Portfolio"
+                size="sm"
+                closeOnOverlayClick={!deleting}
+            >
+                <div className="p-6">
+                    <div className="mb-4 p-4 border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 rounded-lg max-w-md mx-auto">
+                        <div className="flex items-start text-amber-800 dark:text-amber-200 font-semibold">
+                            <AlertTriangle className="h-5 w-5 mr-3 flex-shrink-0" />
+                            <div>
+                                <h3 className="text-sm">Confirm Liquidation and Closure</h3>
+                                <p className="mt-1 text-sm">
+                                    Do you want to sell all stocks in this portfolio? This will place SELL orders for all holdings and close the portfolio. This action cannot be undone.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </form>
-            </div>
+
+                    {error && (
+                        <div className="mb-4 p-4 border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20 rounded-lg">
+                            <div className="flex items-start text-red-700 dark:text-red-300">
+                                <X className="h-5 w-5 mr-3 flex-shrink-0" />
+                                <div className="text-sm">
+                                    {error}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-end space-x-3">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => { if (!deleting) { setError(null); setIsDeleteDialogOpen(false); } }}
+                            disabled={deleting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            disabled={deleting}
+                            onClick={handleSellAllAndClose}
+                            className="bg-red-900 hover:bg-red text-white"
+                        >
+                            {deleting ? <Loading size="sm" className="mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                            {deleting ? 'Processing...' : 'Close Portfolio'}
+                        </Button>
+                    </div>
+                </div>
+            </Dialog>
         </Dialog>
     );
 };
