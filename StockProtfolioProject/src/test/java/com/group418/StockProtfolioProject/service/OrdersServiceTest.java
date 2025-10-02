@@ -30,7 +30,6 @@ class OrdersServiceTest {
     private OrdersService ordersService;
     private HoldingsRepository holdingsRepository;
     private NotificationService notificationService;
-    private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
