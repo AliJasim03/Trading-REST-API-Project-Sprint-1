@@ -84,6 +84,10 @@ export default function PortfolioSummary({ portfolioSummary }) {
             animateRows={true}
             theme="legacy"
             domLayout="autoHeight"
+             pagination={true}
+            paginationPageSize={5}
+            paginationPageSizeSelector={[5, 10, 20]}
+
         />
       </div>
     </Card>

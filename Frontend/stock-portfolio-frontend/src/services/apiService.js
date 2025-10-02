@@ -195,6 +195,43 @@ const apiService = {
         }
     },
 
+    addStock: async (stockData) => {
+        try {
+            const response = await apiClient.post('/stocks', stockData);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    searchStocks: async (query) => {
+        try {
+            const response = await apiClient.get(`/stocks/search?q=${encodeURIComponent(query)}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // LivePrices page specific methods
+    addStockToDatabase: async (stockData) => {
+        try {
+            const response = await apiClient.post('/stocks', stockData);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    searchStockSuggestions: async (query) => {
+        try {
+            const response = await apiClient.get(`/stocks/search?q=${encodeURIComponent(query)}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // Price history
     getPriceHistory: async (stockId) => {
         try {
@@ -351,6 +388,16 @@ const watchlistService = {
                 targetPrice,
                 alertDirection
             });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Search for stocks using Finnhub symbol lookup
+    searchStocks: async (query) => {
+        try {
+            const response = await apiClient.get(`/api/stocks/search?q=${encodeURIComponent(query)}`);
             return response.data;
         } catch (error) {
             throw error;

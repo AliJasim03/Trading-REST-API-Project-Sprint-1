@@ -142,6 +142,9 @@ const agGridTheme = useAgGridTheme();
                         theme="legacy"
                         domLayout='autoHeight'
                         pagination={true}
+                        paginationPageSize={5}
+                        paginationPageSizeSelector={[5, 10, 20]}
+
                     />
                 </div>
             )}

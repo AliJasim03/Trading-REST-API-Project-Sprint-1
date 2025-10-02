@@ -80,6 +80,17 @@ public class StocksController {
         return ResponseEntity.ok(profile);
     }
 
+    /**
+     * Search for stocks using Finnhub symbol lookup
+     * @param query Search query string
+     * @return List of matching stock symbols and names
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Map<String, Object>>> searchStocks(@RequestParam String q) {
+        List<Map<String, Object>> results = finnhubService.symbolLookup(q);
+        return ResponseEntity.ok(results);
+    }
+
     @PostMapping
     public ResponseEntity<Stocks> createStock(@RequestBody Stocks stock) {
         Stocks createdStock = stocksService.createStock(stock);

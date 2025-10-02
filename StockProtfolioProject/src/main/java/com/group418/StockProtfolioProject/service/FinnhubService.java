@@ -9,11 +9,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class FinnhubService {
 
-    private static final String FINNHUB_API_KEY = "d3efm4pr01qrd38u8800d3efm4pr01qrd38u880g";
+    private static final String FINNHUB_API_KEY = "d3f57h9r01qh40fgtng0d3f57h9r01qh40fgtngg";
     private static final String FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 
     private final RestTemplate restTemplate;
@@ -84,6 +86,55 @@ public class FinnhubService {
             throw new RuntimeException("Failed to fetch company profile: " + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException("Error processing company profile: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Search for stocks using symbol lookup
+     * @param query Search query string
+     * @return List of matching stock symbols and names
+     */
+    public List<Map<String, Object>> symbolLookup(String query) {
+        try {
+            String url = String.format("%s/search?q=%s&token=%s",
+                    FINNHUB_BASE_URL, query.toUpperCase(), FINNHUB_API_KEY);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JsonNode root = objectMapper.readTree(response.getBody());
+
+            List<Map<String, Object>> results = new ArrayList<>();
+            JsonNode resultsArray = root.path("result");
+
+            if (resultsArray.isArray()) {
+                for (JsonNode stockNode : resultsArray) {
+                    String symbol = stockNode.path("symbol").asText();
+                    String type = stockNode.path("type").asText();
+                    
+                    // Filter out unwanted securities:
+                    // - Only include common stocks
+                    // - Exclude symbols with dots (preferred shares, warrants)
+                    // - Exclude symbols with numbers (class shares, warrants)
+                    // - Exclude symbols longer than 5 characters
+                    if (("Common Stock".equals(type) || "EQS".equals(type)) && 
+                        !symbol.contains(".") && 
+                        !symbol.matches(".*\\d.*") && 
+                        symbol.length() <= 5 &&
+                        symbol.matches("^[A-Z]+$")) {
+                        
+                        Map<String, Object> stock = new HashMap<>();
+                        stock.put("symbol", symbol);
+                        stock.put("description", stockNode.path("description").asText());
+                        stock.put("type", type);
+                        results.add(stock);
+                    }
+                }
+            }
+
+            return results;
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Failed to search symbols: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing symbol search: " + e.getMessage());
         }
     }
 }
