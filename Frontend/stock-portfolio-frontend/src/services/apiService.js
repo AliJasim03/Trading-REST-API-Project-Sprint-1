@@ -191,6 +191,34 @@ const apiService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    // Finnhub Live Prices API (NEW)
+    getLivePrice: async (stockId) => {
+        try {
+            const response = await apiClient.get(`/stocks/${stockId}/live-price`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getLivePriceBySymbol: async (symbol) => {
+        try {
+            const response = await apiClient.get(`/stocks/ticker/${symbol}/live-price`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    getCompanyProfile: async (symbol) => {
+        try {
+            const response = await apiClient.get(`/stocks/ticker/${symbol}/profile`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 
@@ -320,4 +348,4 @@ const watchlistService = {
 
 // Export both services
 export default apiService;
-export { livePriceService as livePrices, watchlistService };
+export {livePriceService as livePrices, watchlistService};
