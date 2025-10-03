@@ -26,9 +26,7 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/stock_portfolio?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-      SERVER_PORT: 8081
     ports:
       - "8081:8080"
     networks:
@@ -38,10 +36,15 @@ services:
     build: ./Frontend/stock-portfolio-frontend
     container_name: react-container
     environment:
-      - PORT=8100
-      - VITE_API_URL=${VITE_API_URL}
+      - VITE_API_URL=http://localhost:8081
     ports:
       - "8100:3000"
     networks:
       - springboot-network
     command: ["npm", "run", "dev", "--", "--host"]
+
+volumes:
+  mysql-data:
+
+networks:
+  springboot-network:
