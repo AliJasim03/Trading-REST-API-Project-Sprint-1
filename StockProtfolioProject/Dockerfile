@@ -9,6 +9,6 @@ RUN mvn clean install -DskipTests
 
 FROM openjdk:17-jdk-slim
 VOLUME /tmp
-COPY --from=build /app/target/crudapi-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/StockProtfolioProject-0.0.1-SNAPSHOT.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]
