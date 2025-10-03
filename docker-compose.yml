@@ -36,7 +36,7 @@ services:
     build: ./Frontend/stock-portfolio-frontend
     container_name: react-container
     environment:
-      - VITE_API_URL=http://localhost:8081
+      - VITE_API_URL=http://54.155.144.231:8081
     ports:
       - "8100:3000"
     networks:
