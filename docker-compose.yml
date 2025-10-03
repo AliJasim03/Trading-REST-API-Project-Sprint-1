@@ -38,7 +38,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8081
     ports:
-      - "8100:5173"
+      - "8100:3000"
     networks:
       - springboot-network
     command: ["npm", "run", "dev", "--", "--host"]
