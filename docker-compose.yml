@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - springboot-network
+
+  springboot-app:
+    build: ./StockProtfolioProject
+    container_name: springboot-container
+    depends_on:
+      - mysql
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:mysql://mysql:3306/mydb
+      DB_USER: user
+      DB_PASS: password
+    ports:
+      - "8081:8081"
+    networks:
+      - springboot-network
+
+  frontend:
+    build: ./Frontend/stock-portfolio-frontend
+    container_name: react-container
+    environment:
+      - PORT=8100
+      - VITE_API_URL=${VITE_API_URL}
+    ports:
+      - "8100:8100"
+    networks:
+      - springboot-network
+    command: ["npm", "run", "dev", "--", "--host"]
+
+volumes:
+  mysql-data:
+
+networks:
+  springboot-network:
