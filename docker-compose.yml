@@ -13,6 +13,11 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - springboot-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      timeout: 20s
+      retries: 10
+      interval: 3s
 
   springboot-app:
     build: ./StockProtfolioProject
@@ -40,9 +45,3 @@ services:
     networks:
       - springboot-network
     command: ["npm", "run", "dev", "--", "--host"]
-
-volumes:
-  mysql-data:
-
-networks:
-  springboot-network:
